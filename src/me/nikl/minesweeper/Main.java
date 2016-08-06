@@ -25,7 +25,7 @@ public class Main extends JavaPlugin {
 	private FileConfiguration config;
 	private File con;
 	public static Economy econ = null;
-	public static String prefix = "[Minesweeper]";
+	public static String prefix = "[&3Minesweeper&r]";
 	public Boolean econEnabled, wonCommandsEnabled;
 	public List<String> wonCommands;
 	public Double reward, price;
