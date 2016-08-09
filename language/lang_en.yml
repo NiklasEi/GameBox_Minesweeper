@@ -20,7 +20,7 @@ game:
     lost: "Minesweeper     &4You lost"
 
   
-  
+prefix: "[&3Minesweeper&r]"
 
 
 
