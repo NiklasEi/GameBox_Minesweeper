@@ -39,7 +39,7 @@ public class Game{
 		this.bombsNum = 0;
 		this.displayTime = "00:00";
 		if(plugin.getConfig() == null){
-			Bukkit.getConsoleSender().sendMessage(plugin.chatColor(Main.prefix + " Failed to load config!"));
+			Bukkit.getConsoleSender().sendMessage(plugin.chatColor(lang.PREFIX + " Failed to load config!"));
 			Bukkit.getPluginManager().disablePlugin(plugin);
 		}
 		if(plugin.getConfig().isInt("mines")){
@@ -50,8 +50,8 @@ public class Game{
 			this.bombsNum = 8;
 		}
 		if(!getMaterials()){
-			Bukkit.getConsoleSender().sendMessage(plugin.chatColor(Main.prefix+" &4Failed to load materials from config"));
-			Bukkit.getConsoleSender().sendMessage(plugin.chatColor(Main.prefix+" &4Using default materials"));
+			Bukkit.getConsoleSender().sendMessage(plugin.chatColor(lang.PREFIX+" &4Failed to load materials from config"));
+			Bukkit.getConsoleSender().sendMessage(plugin.chatColor(lang.PREFIX+" &4Using default materials"));
 			this.flagged = new ItemStack(Material.SIGN);
 			ItemMeta metaFlagged = flagged.getItemMeta();
 			metaFlagged.setDisplayName("Flag");
@@ -310,6 +310,7 @@ public class Game{
 			}
 		}
 		if(count == bombsNum){
+			plugin.setStatistics(this.player, this.displayTime, bombsNum);
 			return true;
 		}
 		return false;

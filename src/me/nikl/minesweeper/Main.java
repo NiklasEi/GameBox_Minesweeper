@@ -3,11 +3,14 @@ package me.nikl.minesweeper;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -22,10 +25,10 @@ import net.milkbowl.vault.economy.Economy;
 public class Main extends JavaPlugin {
 
 	private GameManager manager;
-	private FileConfiguration config;
-	private File con;
+	private FileConfiguration config, statistics;
+	private File con, sta;
 	public static Economy econ = null;
-	public static String prefix = "[&3Minesweeper&r]";
+	public String prefix;
 	public Boolean econEnabled, wonCommandsEnabled;
 	public List<String> wonCommands;
 	public Double reward, price;
@@ -35,6 +38,7 @@ public class Main extends JavaPlugin {
 	@Override
 	public void onEnable(){
 		this.con = new File(this.getDataFolder().toString() + File.separatorChar + "config.yml");
+		this.sta = new File(this.getDataFolder().toString() + File.separatorChar + "stats.yml");
 
 		reload();
 		if(disabled) return;
@@ -45,7 +49,11 @@ public class Main extends JavaPlugin {
 	
 	@Override
 	public void onDisable(){
-		
+		try {
+			this.statistics.save(sta);
+		} catch (IOException e) {
+			getLogger().log(Level.SEVERE, "Could not save statistics", e);
+		}
 	}
 	
     private boolean setupEconomy(){
@@ -85,7 +93,21 @@ public class Main extends JavaPlugin {
 		if(!con.exists()){
 			this.saveResource("config.yml", false);
 		}
+		if(!sta.exists()){
+			try {
+				sta.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		reloadConfig();
+		
+		// load statsfile
+		try {
+			this.statistics = YamlConfiguration.loadConfiguration(new InputStreamReader(new FileInputStream(this.sta), "UTF-8"));
+		} catch (UnsupportedEncodingException | FileNotFoundException e) {
+			e.printStackTrace();
+		} 
 		
 		this.lang = new Language(this);
 		
@@ -140,4 +162,22 @@ public class Main extends JavaPlugin {
     public Double getPrice(){
     	return this.price;
     }
+
+	public void setStatistics(UUID player, String displayTime, int bombsNum) {
+		if(this.statistics == null) return;
+		if(!statistics.isSet(player.toString() + "." + bombsNum)){
+			statistics.set(player.toString() + "." + bombsNum, displayTime);
+			return;
+		}
+		boolean newRecord = false;
+		String[] newTime = displayTime.split(":");
+		String[] oldTime = statistics.getString(player.toString() + "." + bombsNum).split(":");
+		if(Integer.parseInt(newTime[0]) < Integer.parseInt(oldTime[0])){
+			newRecord = true;
+		} else if(Integer.parseInt(newTime[1]) < Integer.parseInt(oldTime[1])){
+			newRecord = true;
+		}
+		if(!newRecord) return;
+		this.statistics.set(player.toString() + "." + bombsNum, displayTime);
+	}
 }

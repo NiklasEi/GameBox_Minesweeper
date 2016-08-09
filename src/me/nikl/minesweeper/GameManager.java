@@ -31,9 +31,7 @@ public class GameManager implements Listener{
 			return;
 		}
 		if(!e.getClickedInventory().equals(games.get(e.getWhoClicked().getUniqueId()).getInv())){
-			if(e.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)){
-				e.setCancelled(true);
-			}
+			e.setCancelled(true);
 			return;
 		}
 		Game game = games.get(e.getWhoClicked().getUniqueId());
@@ -57,7 +55,7 @@ public class GameManager implements Listener{
 					if(plugin.econEnabled && !e.getWhoClicked().hasPermission("minesweeper.bypass")){
 						Player player = (Player) e.getWhoClicked();
 						Main.econ.depositPlayer(player, plugin.getConfig().getDouble("economy.reward"));
-						player.sendMessage(plugin.chatColor(Main.prefix + lang.GAME_WON_MONEY.replaceAll("%reward%", plugin.getReward()+"")));
+						player.sendMessage(plugin.chatColor(lang.PREFIX + lang.GAME_WON_MONEY.replaceAll("%reward%", plugin.getReward()+"")));
 						
 					}
 					if(plugin.wonCommandsEnabled && !e.getWhoClicked().hasPermission("minesweeper.bypass")){
