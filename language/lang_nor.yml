@@ -18,9 +18,11 @@ game:
     # bruk %timer% for å vise tiden spilt
     won: "Minesweeper     &2Du brukte &1%timer% får å vinne"
     lost: "Minesweeper     &4Du tapte"
+  
+  
+  
+prefix: "[&3Minesweeper&r]"
 
-  
-  
 
 
 
@@ -32,5 +34,3 @@ commandMessages:
   # vises når feil argumenter brukes
   help:
   - " &cFeil i kommandosyntaks. &3/Mines"
-  
-prefix: "[&3Minesweeper&r]"
