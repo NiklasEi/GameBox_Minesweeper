@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -24,6 +23,7 @@ public class Language {
 	
 	public String GAME_PAYED, GAME_NOT_ENOUGH_MONEY, GAME_WON_MONEY, CMD_NO_PERM, CMD_ONLY_AS_PLAYER, CMD_RELOADED;
 	public String TITLE_BEGINNING, TITLE_INGAME, TITLE_END, TITLE_LOST;
+	public String PREFIX;
 	public List<String> CMD_HELP;
 	private YamlConfiguration defaultLang;
 	
@@ -33,6 +33,7 @@ public class Language {
 			plugin.disabled = true;
 			return;
 		}
+		PREFIX = getString("prefix");
 		getCommandMessages();
 		getGameMessages();
 	}
@@ -56,16 +57,17 @@ public class Language {
 		this.CMD_HELP = getStringList("commandMessages.help");		
 	}
 
+
 	private List<String> getStringList(String path) {
 		if(!langFile.isList(path)){
-			return Arrays.asList(" &4StringList missing in Language file (" + path +")");
+			return defaultLang.getStringList(path);
 		}
 		return langFile.getStringList(path);
 	}
 
 	private String getString(String path) {
 		if(!langFile.isString(path)){
-			return " &4String missing in language file! (" + path + ")";
+			return defaultLang.getString(path);
 		}
 		return langFile.getString(path);
 	}
@@ -118,35 +120,37 @@ public class Language {
 			e2.printStackTrace();
 		}
 		
+		String defaultPrefix = "[&3Minesweeper&r]";
+		
 		File defaultEn = new File(plugin.getDataFolder().toString() + File.separatorChar + "language" + File.separatorChar + "lang_en.yml");
 		if(!defaultEn.exists()){
 			plugin.saveResource("language" + File.separatorChar + "lang_en.yml", false);
 		}
 		if(!plugin.getConfig().isString("langFile")){
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&4*******************************************************"));
-			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.prefix + " &4Language file is missing in the config!"));
-			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.prefix + " &4Add the following to your config:"));
-			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.prefix + " langFile: 'lang_en.yml'"));
+			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " &4Language file is missing in the config!"));
+			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " &4Add the following to your config:"));
+			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " langFile: 'lang_en.yml'"));
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&4*******************************************************"));
-			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.prefix + " &4Using default language file"));
+			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " &4Using default language file"));
 			this.langFile = defaultLang;
 			return true;
 		}
 		File languageFile = new File(plugin.getDataFolder().toString() + File.separatorChar + "language" + File.separatorChar + plugin.getConfig().getString("langFile"));
 		if(!plugin.getConfig().isString("langFile")){
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&4*******************************************************"));
-			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.prefix + " &4Language file is missing in the config!"));
+			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " &4Language file is missing in the config!"));
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&4*******************************************************"));
-			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.prefix + " &4Using default language file"));
+			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " &4Using default language file"));
 			this.langFile = defaultLang;
 			return true;
 		}
 		if(!languageFile.exists()){
 			languageFile.mkdir();
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&4*******************************************************"));
-			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.prefix + " &4Language file not found!"));
+			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " &4Language file not found!"));
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&4*******************************************************"));
-			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.prefix + " &4Using default language file"));
+			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " &4Using default language file"));
 			this.langFile = defaultLang;
 			return true;
 		}
@@ -155,17 +159,17 @@ public class Language {
 		} catch (UnsupportedEncodingException e) { 
 			e.printStackTrace(); 
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&4*******************************************************"));
-			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.prefix + " &4Error in language file!"));
+			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " &4Error in language file!"));
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&4*******************************************************"));
-			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.prefix + " &4Using default language file"));
+			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " &4Using default language file"));
 			this.langFile = defaultLang;
 			return true;
 		} catch (FileNotFoundException e) { 
 			e.printStackTrace(); 
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&4*******************************************************"));
-			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.prefix + " &4Error in language file!"));
+			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " &4Error in language file!"));
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&4*******************************************************"));
-			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.prefix + " &4Using default language file"));
+			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " &4Using default language file"));
 			this.langFile = defaultLang;
 			return true;
 		} 
@@ -174,21 +178,21 @@ public class Language {
 			if(defaultLang.isString(key)){
 				if(!this.langFile.isString(key)){// there is a message missing
 					if(count == 0){
-						Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.prefix + " &4*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*"));
-						Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.prefix + " &4Missing message(s) in your language file!"));
+						Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " &4*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*"));
+						Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " &4Missing message(s) in your language file!"));
 					}
-					Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.prefix + " " + key));
+					Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " " + key));
 					count++;
 				}
 			}
 		}
 		if(count > 0){
-			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.prefix + ""));
-			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.prefix + " &4Game will use default messages for these paths"));
-			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.prefix + ""));
-			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.prefix + " &4Please get an updated language file"));
-			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.prefix + " &4Or add the listed paths by hand"));
-			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', Main.prefix + " &4*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*"));
+			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + ""));
+			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " &4Game will use default messages for these paths"));
+			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + ""));
+			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " &4Please get an updated language file"));
+			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " &4Or add the listed paths by hand"));
+			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " &4*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*"));
 		}
 		return true;
 		
