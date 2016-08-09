@@ -1,0 +1,36 @@
+# bruk "&" for farger
+#   placeholders står oppført over setningene
+
+# Titler og meldinger som er relatert direkte i spillet
+game:
+  econ:
+    # bruk %cost% for beløpet betalt
+    payed: " &2Du betalte &4%cost%"
+    notEnoughMoney: " &4Du har ikke nok penger!"
+    # bruk %reward% for beløpet spilleren vant
+    wonMoney: " &2Du vant &1%reward%&2!"
+  inventoryTitles:
+    # vises før spillet starter
+    beginning: "Minesweeper        &2Klikk for å starte"
+    # bruk %state% for å vise antall flagg og antall miner som er igjen
+    #   %timer% vil bli erstattet av en stoppeklokke
+    ingame: "Minesweeper     %state%   &1%timer%"
+    # bruk %timer% for å vise tiden spilt
+    won: "Minesweeper     &2Du brukte &1%timer% får å vinne"
+    lost: "Minesweeper     &4Du tapte"
+
+  
+  
+
+
+
+# Meldinger knyttet til kommandoer
+commandMessages:
+  noPermission: " &cIkke nok rettigheter"
+  onlyAsPlayer: " &cDu kan bare gjøre det som en spiller!"
+  pluginReloaded: " &cconfig lastet"
+  # vises når feil argumenter brukes
+  help:
+  - " &cFeil i kommandosyntaks. &3/Mines"
+  
+prefix: "[&3Minesweeper&r]"
