@@ -21,7 +21,7 @@ public class Language {
 	private Main plugin;
 	private FileConfiguration langFile;
 	
-	public String GAME_PAYED, GAME_NOT_ENOUGH_MONEY, GAME_WON_MONEY, CMD_NO_PERM, CMD_ONLY_AS_PLAYER, CMD_RELOADED;
+	public String GAME_PAYED, GAME_NOT_ENOUGH_MONEY, GAME_WON_MONEY, CMD_NO_PERM, CMD_ONLY_AS_PLAYER, CMD_RELOADED, CMD_NO_TOP_LIST, CMD_TOP_HEAD, CMD_TOP_TAIL, CMD_TOP_STRUCTURE;
 	public String TITLE_BEGINNING, TITLE_INGAME, TITLE_END, TITLE_LOST;
 	public String PREFIX;
 	public List<String> CMD_HELP;
@@ -29,13 +29,38 @@ public class Language {
 	
 	public Language(Main plugin){
 		this.plugin = plugin;
-		if(!getLangFile()){
-			plugin.disabled = true;
-			return;
-		}
+		getLangFile();
 		PREFIX = getString("prefix");
 		getCommandMessages();
 		getGameMessages();
+		// check for 1.8.x version
+		// if this is the version of the server check the length of the titles and shorten them if necessary
+		if(Bukkit.getBukkitVersion().split("\\.|-")[0].equals("1") && Bukkit.getBukkitVersion().split("\\.|-")[1].equals("8")){
+			boolean set = false; 
+			if(TITLE_BEGINNING.length() > 32){
+				set = true;
+				TITLE_BEGINNING = "Title in lang file too long!";
+			}
+			if((TITLE_INGAME.replaceAll("%state%", "55555").replaceAll("%timer%", "55555")).length() > 32){
+				set = true;
+				TITLE_INGAME = "Title in lang file too long!";
+			}
+			if((TITLE_END.replaceAll("%timer%", "55555")).length() > 32){
+				set = true;
+				TITLE_END = "Title in lang file too long!";
+			}
+			if(TITLE_LOST.length() > 32){
+				set = true;
+				TITLE_LOST = "Title in lang file too long!";
+			}
+			if(set){
+				Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', this.PREFIX + " &4+-+-+-+-+-+-+-+-+-+ Warning +-+-+-+-+-+-+-+-+-+"));
+				Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', this.PREFIX + " &4In 1.8.x inventory titles longer than 32 characters will lead to an error"));
+				Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', this.PREFIX + " &4Since this does not happen in 1.9.x and above the default titles are longer"));
+				Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', this.PREFIX + " &4Please shorten the inventory titles in the language file you use (set in the config)"));
+				Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', this.PREFIX + " &4Until you do this the titles will be shortend by the plugin to prevent the error!"));
+			}
+		}
 	}
 	
 	private void getGameMessages() {
@@ -52,7 +77,12 @@ public class Language {
 	private void getCommandMessages() {
 		CMD_NO_PERM = getString("commandMessages.noPermission");
 		CMD_ONLY_AS_PLAYER = getString("commandMessages.onlyAsPlayer");
-		CMD_RELOADED = getString("commandMessages.pluginReloaded");		
+		CMD_RELOADED = getString("commandMessages.pluginReloaded");
+		
+		CMD_NO_TOP_LIST = getString("commandMessages.noTopList");
+		CMD_TOP_HEAD = getString("commandMessages.topListHead");
+		CMD_TOP_TAIL = getString("commandMessages.topListTail");
+		CMD_TOP_STRUCTURE = getString("commandMessages.topListStructure");
 
 		this.CMD_HELP = getStringList("commandMessages.help");		
 	}
@@ -72,7 +102,7 @@ public class Language {
 		return langFile.getString(path);
 	}
 
-	private boolean getLangFile() {
+	private void getLangFile() {
 
 		InputStream inputStream = null;
 		OutputStream outputStream = null;
@@ -138,7 +168,7 @@ public class Language {
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&4*******************************************************"));
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " &4Using default language file"));
 			this.langFile = defaultLang;
-			return true;
+			return;
 		}
 		File languageFile = new File(plugin.getDataFolder().toString() + File.separatorChar + "language" + File.separatorChar + plugin.getConfig().getString("langFile"));
 		if(!plugin.getConfig().isString("langFile")){
@@ -147,7 +177,7 @@ public class Language {
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&4*******************************************************"));
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " &4Using default language file"));
 			this.langFile = defaultLang;
-			return true;
+			return;
 		}
 		if(!languageFile.exists()){
 			languageFile.mkdir();
@@ -156,7 +186,7 @@ public class Language {
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&4*******************************************************"));
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " &4Using default language file"));
 			this.langFile = defaultLang;
-			return true;
+			return;
 		}
 		try { 
 			this.langFile = YamlConfiguration.loadConfiguration(new InputStreamReader(new FileInputStream(languageFile), "UTF-8")); 
@@ -167,7 +197,7 @@ public class Language {
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&4*******************************************************"));
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " &4Using default language file"));
 			this.langFile = defaultLang;
-			return true;
+			return;
 		} catch (FileNotFoundException e) { 
 			e.printStackTrace(); 
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&4*******************************************************"));
@@ -175,7 +205,7 @@ public class Language {
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&4*******************************************************"));
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " &4Using default language file"));
 			this.langFile = defaultLang;
-			return true;
+			return;
 		} 
 		int count = 0;
 		for(String key : defaultLang.getKeys(true)){
@@ -198,7 +228,7 @@ public class Language {
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " &4Or add the listed paths by hand"));
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', defaultPrefix + " &4*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*"));
 		}
-		return true;
+		return;
 		
 	}
 	
