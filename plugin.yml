@@ -1,12 +1,16 @@
 name: Minesweeper
 author: Nikl
 main: me.nikl.minesweeper.Main
-version: 1.5.1
+version: 1.5.2
 commands:
   minesweeper:
     description: play the game
     usage: /minesweeper
     aliases: [mines, ms]
+  minesweepertop:
+    description: display the top 10
+    usage: /minesweepertop
+    aliases: [mstop]
 permissions:
   minesweeper.*:
     description: Gives all permissions
@@ -17,10 +21,14 @@ permissions:
     default: op
     children:
       minesweeper.play: true
+      minesweeper.top: true
       minesweeper.reload: true
       minesweeper.bypass: true
   minesweeper.play:
     description: You are allowed to play
+    default: true
+  minesweeper.top:
+    description: You are allowed to see the top list
     default: true
   minesweeper.reload:
     description: You can reload the plugin
