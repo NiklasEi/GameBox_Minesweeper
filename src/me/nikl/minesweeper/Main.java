@@ -45,6 +45,7 @@ public class Main extends JavaPlugin {
 
 		this.setManager(new GameManager(this));
         this.getCommand("minesweeper").setExecutor(new Commands(this));
+        this.getCommand("minesweepertop").setExecutor(new TopCommand(this));
 	}
 	
 	@Override
@@ -134,6 +135,10 @@ public class Main extends JavaPlugin {
 			}
 		}
 	}
+	
+	public FileConfiguration getStatistics(){
+		return this.statistics;
+	}
 
 	public void setManager(GameManager manager) {
 		this.manager = manager;
@@ -165,19 +170,18 @@ public class Main extends JavaPlugin {
 
 	public void setStatistics(UUID player, String displayTime, int bombsNum) {
 		if(this.statistics == null) return;
-		if(!statistics.isSet(player.toString() + "." + bombsNum)){
-			statistics.set(player.toString() + "." + bombsNum, displayTime);
+		String[] timeSplit = displayTime.split(":");
+		int newTime = Integer.parseInt(timeSplit[0])*60 + Integer.parseInt(timeSplit[1]);
+		if(!statistics.isInt(player.toString() + "." + bombsNum)){
+			statistics.set(player.toString() + "." + bombsNum, newTime);
 			return;
 		}
 		boolean newRecord = false;
-		String[] newTime = displayTime.split(":");
-		String[] oldTime = statistics.getString(player.toString() + "." + bombsNum).split(":");
-		if(Integer.parseInt(newTime[0]) < Integer.parseInt(oldTime[0])){
-			newRecord = true;
-		} else if(Integer.parseInt(newTime[1]) < Integer.parseInt(oldTime[1])){
+		int oldTime = statistics.getInt(player.toString() + "." + bombsNum);
+		if(newTime < oldTime){
 			newRecord = true;
 		}
 		if(!newRecord) return;
-		this.statistics.set(player.toString() + "." + bombsNum, displayTime);
+		this.statistics.set(player.toString() + "." + bombsNum, newTime);
 	}
 }
