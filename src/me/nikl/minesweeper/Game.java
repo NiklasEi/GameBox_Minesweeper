@@ -14,6 +14,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Wool;
 
+import me.nikl.minesweeper.nms.Update;
+
 public class Game{
 	private ItemStack empty, flagged, mine, covered, number;
 	private Inventory inv;
@@ -21,15 +23,17 @@ public class Game{
 	private String[] positions;
 	private Boolean[] cov; //Array with covered/not covered info
 	private boolean changingInv;
-	private String displayFlags, displayTime;
+	private String displayFlags, displayTime, currentState;
 	private UUID player;
 	private Language lang;
 	private boolean started;
+	private Update updater;
 	
 	private Main plugin;
 	private GameTimer timer;
 	
 	public Game(Main plugin, UUID player){
+		this.updater = plugin.getUpdater();
 		this.setStarted(false);
 		this.player = player;
 		this.setChangingInv(false);
@@ -270,14 +274,16 @@ public class Game{
 		this.inv.setItem(slot, flagged);
 		flags++;
 		this.displayFlags = "   &2"+flags+"&r/&4"+bombsNum;
-		setState(lang.TITLE_INGAME.replaceAll("%state%", displayFlags).replaceAll("%timer%", displayTime));
+		currentState = lang.TITLE_INGAME.replaceAll("%state%", displayFlags).replaceAll("%timer%", displayTime);
+		setState(currentState);
 	}
 
 	public void deFlag(int slot) {
 		this.inv.setItem(slot, covered);	
 		flags--;
 		this.displayFlags = "   &2"+flags+"&r/&4"+bombsNum;
-		setState(lang.TITLE_INGAME.replaceAll("%state%", displayFlags).replaceAll("%timer%", displayTime));
+		currentState = lang.TITLE_INGAME.replaceAll("%state%", displayFlags).replaceAll("%timer%", displayTime);
+		setState(currentState);
 	}
 	
 	public void uncover(int slot){
@@ -317,9 +323,14 @@ public class Game{
 	}
 
 	public void setState(String state){
-		Inventory newInv = Bukkit.getServer().createInventory(null, num, ChatColor.translateAlternateColorCodes('&', state));
+		Player playerP = Bukkit.getPlayer(player);
+		if(playerP == null){
+			plugin.getManager().removeGame(player);
+		}
+		updater.updateTitle(Bukkit.getPlayer(player), ChatColor.translateAlternateColorCodes('&',state));
+		/*Inventory newInv = Bukkit.getServer().createInventory(null, num, ChatColor.translateAlternateColorCodes('&', state));
 		newInv.setContents(this.inv.getContents());
-		this.inv = newInv;
+		this.inv = newInv;*/
 	}
 	
 	public String getState(){
@@ -328,7 +339,8 @@ public class Game{
 
 	public void setState() {
 		this.displayFlags = "   &2"+flags+"&r/&4"+bombsNum;	
-		setState(lang.TITLE_INGAME.replaceAll("%state%", displayFlags).replaceAll("%timer%", displayTime));
+		currentState = lang.TITLE_INGAME.replaceAll("%state%", displayFlags).replaceAll("%timer%", displayTime);
+		setState(currentState);
 	}
 
 	public boolean isChangingInv() {
@@ -340,9 +352,10 @@ public class Game{
 	}
 
 	public void setTime(String string) {
-		this.displayTime = string;		
-		setState(lang.TITLE_INGAME.replaceAll("%state%", displayFlags).replaceAll("%timer%", displayTime));
-		showGame(Bukkit.getPlayer(player));
+		this.displayTime = string;
+		currentState = lang.TITLE_INGAME.replaceAll("%state%", displayFlags).replaceAll("%timer%", displayTime);
+		setState(currentState);
+		//showGame(Bukkit.getPlayer(player));
 	}
 
 	public void startTimer() {
