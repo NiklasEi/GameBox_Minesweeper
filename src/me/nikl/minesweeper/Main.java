@@ -19,6 +19,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import me.nikl.minesweeper.nms.*;
 import net.milkbowl.vault.economy.Economy;
 
 
@@ -34,9 +35,18 @@ public class Main extends JavaPlugin {
 	public Double reward, price;
 	public Language lang;
 	public boolean disabled;
+	private Update updater;
 	
 	@Override
 	public void onEnable(){
+
+        if (!setupUpdater()) {
+            getLogger().severe("Your server version is not compatible with this plugin!");
+
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+        
 		this.con = new File(this.getDataFolder().toString() + File.separatorChar + "config.yml");
 		this.sta = new File(this.getDataFolder().toString() + File.separatorChar + "stats.yml");
 
@@ -47,6 +57,43 @@ public class Main extends JavaPlugin {
         this.getCommand("minesweeper").setExecutor(new Commands(this));
         this.getCommand("minesweepertop").setExecutor(new TopCommand(this));
 	}
+	
+	private boolean setupUpdater() {  String version;
+
+    try {
+        version = Bukkit.getServer().getClass().getPackage().getName().replace(".",  ",").split(",")[3];
+    } catch (ArrayIndexOutOfBoundsException whatVersionAreYouUsingException) {
+        return false;
+    }
+
+    //getLogger().info("Your server is running version " + version);
+
+    if (version.equals("v1_10_R1")) {
+        updater = new Update_1_10_R1();
+        
+    } else if (version.equals("v1_9_R2")) {
+        updater = new Update_1_9_R2();
+        
+    } else if (version.equals("v1_9_R1")) {
+        updater = new Update_1_9_R1();
+        
+    } else if (version.equals("v1_8_R3")) {
+        updater = new Update_1_8_R3();
+        
+    } else if (version.equals("v1_8_R2")) {
+        updater = new Update_1_8_R2();
+        
+    } else if (version.equals("v1_8_R1")) {
+        updater = new Update_1_8_R1();
+    }
+    return updater != null;
+}
+
+public Update getUpdater(){
+	return this.updater;
+}
+	
+	
 	
 	@Override
 	public void onDisable(){
