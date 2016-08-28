@@ -83,6 +83,10 @@ public class GameManager implements Listener{
 		games.remove(e.getPlayer().getUniqueId());
 	}
 	
+	public void removeGame(UUID player){
+		games.remove(player);
+	}
+	
 
 	public void startGame(Player player){
 		games.put(player.getUniqueId(), new Game(plugin, player.getUniqueId()));
