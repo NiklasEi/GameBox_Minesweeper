@@ -96,6 +96,13 @@ public class Game{
 		    if(!plugin.getConfig().isSet("materials." + key)) return false;
 	    	String value = plugin.getConfig().getString("materials." + key);
 		    String[] obj = value.split(":");
+			String name = "default";
+			boolean named = false;
+			if(plugin.getConfig().isSet("displaynames." + key) && plugin.getConfig().isString("displaynames." + key)){
+				name = plugin.getConfig().getString("displaynames." + key);
+				named = true;
+			}
+			
 	
 		    if (obj.length == 2) {
 		        try {
@@ -122,6 +129,8 @@ public class Game{
 				if (obj.length == 2) covered.setDurability((short) data);
 				ItemMeta metaCovered = covered.getItemMeta();
 				metaCovered.setDisplayName("Cover");
+				if(named)
+					metaCovered.setDisplayName(name);
 				covered.setItemMeta(metaCovered);
 				covered.setAmount(1);
 		    	
@@ -130,6 +139,8 @@ public class Game{
 				if (obj.length == 2) number.setDurability((short) data);
 				ItemMeta metaNumber = number.getItemMeta();
 				metaNumber.setDisplayName("Warning");
+				if(named)
+					metaNumber.setDisplayName(name);
 				number.setItemMeta(metaNumber);
 		    	
 		    } else if(key.equals("mine")){
@@ -137,6 +148,8 @@ public class Game{
 				if (obj.length == 2) mine.setDurability((short) data);
 				ItemMeta metaMine = mine.getItemMeta();
 				metaMine.setDisplayName("Boooom");
+				if(named)
+					metaMine.setDisplayName(name);
 				mine.setItemMeta(metaMine);
 		    	
 		    } else if(key.equals("flag")){
@@ -144,6 +157,8 @@ public class Game{
 				if (obj.length == 2) flagged.setDurability((short) data);
 				ItemMeta metaFlagged = flagged.getItemMeta();
 				metaFlagged.setDisplayName("Flag");
+				if(named)
+					metaFlagged.setDisplayName(name);
 				flagged.setItemMeta(metaFlagged);
 				flagged.setAmount(1);		    	
 		    }
