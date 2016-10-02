@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import me.nikl.minesweeper.commands.Commands;
+import me.nikl.minesweeper.commands.TopCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -55,43 +57,44 @@ public class Main extends JavaPlugin {
 
 		this.setManager(new GameManager(this));
         this.getCommand("minesweeper").setExecutor(new Commands(this));
-        this.getCommand("minesweepertop").setExecutor(new TopCommand(this));
+        this.getCommand("minesweeperTop").setExecutor(new TopCommand(this));
 	}
 	
-	private boolean setupUpdater() {  String version;
+	private boolean setupUpdater() {
+		String version;
+	
+		try {
+			version = Bukkit.getServer().getClass().getPackage().getName().replace(".",  ",").split(",")[3];
+		} catch (ArrayIndexOutOfBoundsException whatVersionAreYouUsingException) {
+			return false;
+		}
+	
+		//getLogger().info("Your server is running version " + version);
+	
+		if (version.equals("v1_10_R1")) {
+			updater = new Update_1_10_R1();
+			
+		} else if (version.equals("v1_9_R2")) {
+			updater = new Update_1_9_R2();
+			
+		} else if (version.equals("v1_9_R1")) {
+			updater = new Update_1_9_R1();
+			
+		} else if (version.equals("v1_8_R3")) {
+			updater = new Update_1_8_R3();
+			
+		} else if (version.equals("v1_8_R2")) {
+			updater = new Update_1_8_R2();
+			
+		} else if (version.equals("v1_8_R1")) {
+			updater = new Update_1_8_R1();
+		}
+		return updater != null;
+	}
 
-    try {
-        version = Bukkit.getServer().getClass().getPackage().getName().replace(".",  ",").split(",")[3];
-    } catch (ArrayIndexOutOfBoundsException whatVersionAreYouUsingException) {
-        return false;
-    }
-
-    //getLogger().info("Your server is running version " + version);
-
-    if (version.equals("v1_10_R1")) {
-        updater = new Update_1_10_R1();
-        
-    } else if (version.equals("v1_9_R2")) {
-        updater = new Update_1_9_R2();
-        
-    } else if (version.equals("v1_9_R1")) {
-        updater = new Update_1_9_R1();
-        
-    } else if (version.equals("v1_8_R3")) {
-        updater = new Update_1_8_R3();
-        
-    } else if (version.equals("v1_8_R2")) {
-        updater = new Update_1_8_R2();
-        
-    } else if (version.equals("v1_8_R1")) {
-        updater = new Update_1_8_R1();
-    }
-    return updater != null;
-}
-
-public Update getUpdater(){
-	return this.updater;
-}
+	public Update getUpdater(){
+		return this.updater;
+	}
 	
 	
 	
@@ -150,7 +153,7 @@ public Update getUpdater(){
 		}
 		reloadConfig();
 		
-		// load statsfile
+		// load stats file
 		try {
 			this.statistics = YamlConfiguration.loadConfiguration(new InputStreamReader(new FileInputStream(this.sta), "UTF-8"));
 		} catch (UnsupportedEncodingException | FileNotFoundException e) {
@@ -193,10 +196,6 @@ public Update getUpdater(){
 
 	public FileConfiguration getConfig() {
 		return config;
-	}
-
-	public void setConfig(FileConfiguration config) {
-		this.config = config;
 	}
 	
     public String chatColor(String message){
