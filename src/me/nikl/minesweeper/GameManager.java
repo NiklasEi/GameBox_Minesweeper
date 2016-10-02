@@ -70,7 +70,7 @@ public class GameManager implements Listener{
 			game.deFlag(slot);			
 		}
 		e.setCancelled(true);
-		game.showGame((Player) e.getWhoClicked());
+		//game.showGame((Player) e.getWhoClicked());
 	}
 	
 
