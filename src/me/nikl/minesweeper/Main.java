@@ -31,7 +31,6 @@ public class Main extends JavaPlugin {
 	private FileConfiguration config, statistics;
 	private File con, sta;
 	public static Economy econ = null;
-	public String prefix;
 	public Boolean econEnabled, wonCommandsEnabled;
 	public List<String> wonCommands;
 	public Double reward, price;
@@ -153,14 +152,14 @@ public class Main extends JavaPlugin {
 		}
 		reloadConfig();
 		
+		this.lang = new Language(this);
+		
 		// load stats file
 		try {
 			this.statistics = YamlConfiguration.loadConfiguration(new InputStreamReader(new FileInputStream(this.sta), "UTF-8"));
 		} catch (UnsupportedEncodingException | FileNotFoundException e) {
 			e.printStackTrace();
-		} 
-		
-		this.lang = new Language(this);
+		}
 		
 		this.wonCommandsEnabled = false;
 		this.wonCommands = new ArrayList<String>();
@@ -173,14 +172,15 @@ public class Main extends JavaPlugin {
 		if(getConfig().getBoolean("economy.enabled")){
 			this.econEnabled = true;
 			if (!setupEconomy()){
-				Bukkit.getConsoleSender().sendMessage(chatColor(prefix + " &4No economy found!"));
+				Bukkit.getConsoleSender().sendMessage(chatColor(lang.PREFIX + " &4No economy found!"));
 				getServer().getPluginManager().disablePlugin(this);
+				disabled = true;
 				return;
 			}
 			this.price = getConfig().getDouble("economy.cost");
 			this.reward = getConfig().getDouble("economy.reward");
 			if(price == null || reward == null || price < 0. || reward < 0.){
-				Bukkit.getConsoleSender().sendMessage(chatColor(prefix + " &4Wrong configuration in section economy!"));
+				Bukkit.getConsoleSender().sendMessage(chatColor(lang.PREFIX + " &4Wrong configuration in section economy!"));
 				getServer().getPluginManager().disablePlugin(this);
 			}
 		}
