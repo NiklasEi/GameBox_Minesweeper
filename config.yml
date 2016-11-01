@@ -11,6 +11,13 @@ langFile: "lang_en.yml"
 # number of mines in the game (only integer from 1 to 30)
 mines: 8
 
+rules:
+  # when you reveal an empty slot automatic revealing will uncover all attached empty slots until the first slot
+  #   is not empty
+  # change this to true if you DON'T want this option
+  turnOffAutomaticRevealing: false
+
+
 # requires vault
 economy:
   enabled: false
