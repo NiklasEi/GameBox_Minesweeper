@@ -38,6 +38,8 @@ public class Main extends JavaPlugin {
 	public boolean disabled;
 	private Update updater;
 	
+	public boolean automaticReveal;
+	
 	@Override
 	public void onEnable(){
 
@@ -166,6 +168,11 @@ public class Main extends JavaPlugin {
 		if(this.config.isBoolean("wonCommands.enabled")){
 			this.wonCommandsEnabled = config.getBoolean("wonCommands.enabled");
 			this.wonCommands = config.getStringList("wonCommands.commands");
+		}
+		
+		this.automaticReveal = true;
+		if(config.getBoolean("rules.turnOffAutomaticRevealing")){
+			automaticReveal = false;
 		}
 		
 		this.econEnabled = false;
