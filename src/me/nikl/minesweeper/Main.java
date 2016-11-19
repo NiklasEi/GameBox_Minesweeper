@@ -89,6 +89,9 @@ public class Main extends JavaPlugin {
 			
 		} else if (version.equals("v1_8_R1")) {
 			updater = new Update_1_8_R1();
+			
+		} else if (version.equals("v1_11_R1")) {
+			updater = new Update_1_11_R1();
 		}
 		return updater != null;
 	}
