@@ -43,7 +43,7 @@ materials:
   warning: "WOOL:1"
 
 displaynames:
-  cover: "Cover"
-  warning: "Warning"
-  mine: "Boooom!"
-  flag: "Flag"
+  cover: "&bCover"
+  warning: "&cWarning"
+  mine: "&4Boooom!"
+  flag: "&1Flag"
