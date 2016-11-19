@@ -129,7 +129,7 @@ public class Game{
 				ItemMeta metaCovered = covered.getItemMeta();
 				metaCovered.setDisplayName("Cover");
 				if(named)
-					metaCovered.setDisplayName(name);
+					metaCovered.setDisplayName(plugin.chatColor(name));
 				covered.setItemMeta(metaCovered);
 				covered.setAmount(1);
 		    	
@@ -139,7 +139,7 @@ public class Game{
 				ItemMeta metaNumber = number.getItemMeta();
 				metaNumber.setDisplayName("Warning");
 				if(named)
-					metaNumber.setDisplayName(name);
+					metaNumber.setDisplayName(plugin.chatColor(name));
 				number.setItemMeta(metaNumber);
 		    	
 		    } else if(key.equals("mine")){
@@ -148,7 +148,7 @@ public class Game{
 				ItemMeta metaMine = mine.getItemMeta();
 				metaMine.setDisplayName("Boooom");
 				if(named)
-					metaMine.setDisplayName(name);
+					metaMine.setDisplayName(plugin.chatColor(name));
 				mine.setItemMeta(metaMine);
 		    	
 		    } else if(key.equals("flag")){
@@ -157,7 +157,7 @@ public class Game{
 				ItemMeta metaFlagged = flagged.getItemMeta();
 				metaFlagged.setDisplayName("Flag");
 				if(named)
-					metaFlagged.setDisplayName(name);
+					metaFlagged.setDisplayName(plugin.chatColor(name));
 				flagged.setItemMeta(metaFlagged);
 				flagged.setAmount(1);		    	
 		    }
