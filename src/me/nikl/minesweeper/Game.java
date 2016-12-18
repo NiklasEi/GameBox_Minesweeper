@@ -15,12 +15,13 @@ import org.bukkit.material.Wool;
 
 import me.nikl.minesweeper.nms.Update;
 
+
 public class Game{
 	private ItemStack empty, flagged, mine, covered, number;
 	private Inventory inv;
 	private int num, bombsNum, flags;
 	private String[] positions;
-	private Boolean[] cov; //Array with covered/not covered info
+	private Boolean[] cov, flagsGrid; //Array with covered/not covered info
 	private boolean changingInv;
 	private String displayFlags, displayTime, currentState;
 	private UUID player;
@@ -78,9 +79,11 @@ public class Game{
 		this.flags=0;
 		this.positions = new String[num];
 		this.cov = new Boolean[num];
+		this.flagsGrid = new Boolean[num];
 		for(int i = 0 ;i<num;i++){
 			positions[i] = "0";
 			cov[i]=true;
+			flagsGrid[i] = false;
 		}
 		this.inv = Bukkit.getServer().createInventory(null, num, ChatColor.translateAlternateColorCodes('&', lang.TITLE_BEGINNING));
 		createGame();
@@ -244,12 +247,12 @@ public class Game{
 		return this.inv;
 	}
 	
-	public Boolean isCovered(ItemStack itemS){
-		return covered.getType().equals(itemS.getType()) && covered.getData().equals(itemS.getData());
+	public Boolean isCovered(int slot){
+		return (this.cov[slot] && !this.flagsGrid[slot]);
 	}
 	
-	public Boolean isFlaged(ItemStack itemS){
-		return flagged.getType().equals(itemS.getType()) && flagged.getData().equals(itemS.getData());
+	public Boolean isFlagged(int slot){
+		return this.flagsGrid[slot];
 	}
 	
 	public Boolean isEmpty(int slot){
@@ -259,6 +262,7 @@ public class Game{
 	public void setFlagged(int slot) {
 		this.inv.setItem(slot, flagged);
 		flags++;
+		this.flagsGrid[slot] = true;
 		this.displayFlags = "   &2"+flags+"&r/&4"+bombsNum;
 		currentState = lang.TITLE_INGAME.replaceAll("%state%", displayFlags).replaceAll("%timer%", displayTime);
 		setState(currentState);
@@ -267,6 +271,7 @@ public class Game{
 	public void deFlag(int slot) {
 		this.inv.setItem(slot, covered);	
 		flags--;
+		this.flagsGrid[slot] = false;
 		this.displayFlags = "   &2"+flags+"&r/&4"+bombsNum;
 		currentState = lang.TITLE_INGAME.replaceAll("%state%", displayFlags).replaceAll("%timer%", displayTime);
 		setState(currentState);
