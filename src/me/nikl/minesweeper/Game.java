@@ -3,10 +3,7 @@ package me.nikl.minesweeper;
 import java.util.*;
 
 import io.netty.util.internal.ConcurrentSet;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.DyeColor;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -31,6 +28,9 @@ public class Game{
 	
 	private Main plugin;
 	private GameTimer timer;
+	
+	//Map with Sounds
+	private Map<String, Sound> soundMap;
 	
 	public Game(Main plugin, UUID player){
 		this.updater = plugin.getUpdater();
@@ -87,6 +87,11 @@ public class Game{
 		}
 		this.inv = Bukkit.getServer().createInventory(null, num, ChatColor.translateAlternateColorCodes('&', lang.TITLE_BEGINNING));
 		createGame();
+	}
+	
+	public Game(Main plugin, UUID player, Map<String, Sound> soundMap){
+		this(plugin, player);
+		this.soundMap = soundMap;
 	}
 	
 	private Boolean getMaterials() {
@@ -281,6 +286,8 @@ public class Game{
 		if(positions[slot].equals("mine")){
 			cancelTimer();
 			reveal();
+			Player realPlayer = Bukkit.getPlayer(player);
+			if(Main.playSounds)realPlayer.playSound(realPlayer.getLocation(), Sounds.EXPLODE.bukkitSound(), 10f, 1f);
 			setState(lang.TITLE_LOST);
 		} else {
 			int amount = 0;
@@ -404,9 +411,6 @@ public class Game{
 			plugin.getManager().removeGame(player);
 		}
 		updater.updateTitle(Bukkit.getPlayer(player), ChatColor.translateAlternateColorCodes('&',state));
-		/*Inventory newInv = Bukkit.getServer().createInventory(null, num, ChatColor.translateAlternateColorCodes('&', state));
-		newInv.setContents(this.inv.getContents());
-		this.inv = newInv;*/
 	}
 	
 	public String getState(){

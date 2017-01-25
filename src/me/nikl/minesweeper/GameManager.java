@@ -19,7 +19,7 @@ public class GameManager implements Listener{
 	private Language lang;
 	
 	public GameManager(Main plugin){
-		this.games = new HashMap<UUID, Game>();
+		this.games = new HashMap<>();
 		this.plugin = plugin;
 		this.lang = plugin.lang;
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -27,50 +27,52 @@ public class GameManager implements Listener{
 	
 	@EventHandler
 	public void onInvClick(InventoryClickEvent e){
-		if(games.get(e.getWhoClicked().getUniqueId()) == null || e.getClickedInventory() == null){
+		if(games.get(e.getWhoClicked().getUniqueId()) == null || e.getInventory() == null){
 			return;
 		}
-		if(!e.getClickedInventory().equals(games.get(e.getWhoClicked().getUniqueId()).getInv())){
-			e.setCancelled(true);
-			return;
-		}
-		Game game = games.get(e.getWhoClicked().getUniqueId());
 		int slot = e.getSlot();
+		e.setCancelled(true);
+		if(slot != e.getRawSlot()) return;
+		if(slot >= e.getInventory().getSize() || slot < 0) return;
+		Game game = games.get(e.getWhoClicked().getUniqueId());
 		if(!game.isStarted()){
 			game.start();
 		}
 		if (game.isEmpty(slot)){
-			e.setCancelled(true);
 			return;
 		}
-		if(game.isCovered(game.getInv().getItem(slot))){
+		Player player = (Player) e.getWhoClicked();
+		if(game.isCovered(slot)){
 			if(e.getAction().equals(InventoryAction.PICKUP_HALF)){
 				game.setFlagged(slot);
+				if(Main.playSounds)player.playSound(player.getLocation(), Sounds.CLICK.bukkitSound(), 10f, 1f);
 			} else if (e.getAction().equals(InventoryAction.PICKUP_ALL)){
 				game.uncover(slot);
 				if(game.isWon()){
 					game.cancelTimer();
 					game.reveal();
 					game.setState(lang.TITLE_END.replaceAll("%timer%", game.getDisplayTime()+""));
+					if(Main.playSounds)player.playSound(player.getLocation(), Sounds.LEVEL_UP.bukkitSound(), 10f, 1f);
 					if(plugin.econEnabled && !e.getWhoClicked().hasPermission("minesweeper.bypass")){
-						Player player = (Player) e.getWhoClicked();
 						Main.econ.depositPlayer(player, plugin.getConfig().getDouble("economy.reward"));
 						player.sendMessage(plugin.chatColor(lang.PREFIX + lang.GAME_WON_MONEY.replaceAll("%reward%", plugin.getReward()+"")));
 						
 					}
 					if(plugin.wonCommandsEnabled && !e.getWhoClicked().hasPermission("minesweeper.bypass")){
-						Player player = (Player) e.getWhoClicked();
-						for(String cmd : plugin.wonCommands){
-							Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", player.getName()));
+						if(plugin.wonCommands != null && !plugin.wonCommands.isEmpty()) {
+							for (String cmd : plugin.wonCommands) {
+								Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", player.getName()));
+							}
 						}
 					}
+				} else {
+					if(Main.playSounds)player.playSound(player.getLocation(), Sounds.CLICK.bukkitSound(), 10f, 1f);
 				}
 			}
-		} else if(game.isFlaged(game.getInv().getItem(slot)) && e.getAction().equals(InventoryAction.PICKUP_HALF)){
-			game.deFlag(slot);			
+		} else if(game.isFlagged(slot) && e.getAction().equals(InventoryAction.PICKUP_HALF)){
+			game.deFlag(slot);
+			if(Main.playSounds)player.playSound(player.getLocation(), Sounds.CLICK.bukkitSound(), 10f, 1f);
 		}
-		e.setCancelled(true);
-		//game.showGame((Player) e.getWhoClicked());
 	}
 	
 

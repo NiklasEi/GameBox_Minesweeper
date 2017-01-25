@@ -31,7 +31,8 @@ public class Main extends JavaPlugin {
 	private FileConfiguration config, statistics;
 	private File con, sta;
 	public static Economy econ = null;
-	public Boolean econEnabled, wonCommandsEnabled;
+	public static boolean playSounds = true;
+	public boolean econEnabled, wonCommandsEnabled;
 	public List<String> wonCommands;
 	public Double reward, price;
 	public Language lang;
@@ -167,7 +168,7 @@ public class Main extends JavaPlugin {
 		}
 		
 		this.wonCommandsEnabled = false;
-		this.wonCommands = new ArrayList<String>();
+		this.wonCommands = new ArrayList<>();
 		if(this.config.isBoolean("wonCommands.enabled")){
 			this.wonCommandsEnabled = config.getBoolean("wonCommands.enabled");
 			this.wonCommands = config.getStringList("wonCommands.commands");
@@ -176,6 +177,11 @@ public class Main extends JavaPlugin {
 		this.automaticReveal = true;
 		if(config.getBoolean("rules.turnOffAutomaticRevealing")){
 			automaticReveal = false;
+		}
+		
+		
+		if(config.isBoolean("rules.playSounds")){
+			playSounds = config.getBoolean("rules.playSounds");
 		}
 		
 		this.econEnabled = false;
@@ -187,6 +193,7 @@ public class Main extends JavaPlugin {
 				disabled = true;
 				return;
 			}
+			
 			this.price = getConfig().getDouble("economy.cost");
 			this.reward = getConfig().getDouble("economy.reward");
 			if(price == null || reward == null || price < 0. || reward < 0.){
