@@ -25,7 +25,7 @@ public class Language {
 			CMD_RELOADED, CMD_NO_TOP_LIST, CMD_TOP_HEAD, CMD_TOP_TAIL, CMD_TOP_STRUCTURE;
 	public String TITLE_BEGINNING, TITLE_INGAME, TITLE_END, TITLE_LOST;
 	public String PREFIX;
-	public List<String> CMD_HELP;
+	public List<String> CMD_HELP, CMD_TOP_HELP;
 	private YamlConfiguration defaultLang;
 	
 	public Language(Main plugin){
@@ -85,7 +85,8 @@ public class Language {
 		CMD_TOP_TAIL = getString("commandMessages.topListTail");
 		CMD_TOP_STRUCTURE = getString("commandMessages.topListStructure");
 
-		this.CMD_HELP = getStringList("commandMessages.help");		
+		this.CMD_HELP = getStringList("commandMessages.help");
+		this.CMD_TOP_HELP = getStringList("commandMessages.topCmdHelp");
 	}
 
 
@@ -161,6 +162,10 @@ public class Language {
 		File defaultNor = new File(plugin.getDataFolder().toString() + File.separatorChar + "language" + File.separatorChar + "lang_nor.yml");
 		if(!defaultNor.exists()){
 			plugin.saveResource("language" + File.separatorChar + "lang_nor.yml", false);
+		}
+		File defaultDe = new File(plugin.getDataFolder().toString() + File.separatorChar + "language" + File.separatorChar + "lang_de.yml");
+		if(!defaultDe.exists()){
+			plugin.saveResource("language" + File.separatorChar + "lang_de.yml", false);
 		}
 		if(!plugin.getConfig().isString("langFile")){
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&4*******************************************************"));

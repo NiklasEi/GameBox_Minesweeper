@@ -3,6 +3,7 @@ package me.nikl.minesweeper.commands;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import me.nikl.minesweeper.Language;
 import me.nikl.minesweeper.Main;
@@ -20,26 +21,90 @@ public class TopCommand implements CommandExecutor {
 	private Language lang;
 	private FileConfiguration stats;
 	private String structure;
+
+	private int easyBombs, normalBombs, hardBombs;
 	
 	public TopCommand(Main plugin){
 		this.plugin = plugin;
 		this.lang = plugin.lang;
 		this.stats = plugin.getStatistics();
 		this.structure = lang.CMD_TOP_STRUCTURE;
+
+		if(plugin.getConfig().isConfigurationSection("mines")) {
+            this.easyBombs = plugin.getConfig().getInt("mines.easy", 5);
+            this.normalBombs = plugin.getConfig().getInt("mines.normal", 8);
+            this.hardBombs = plugin.getConfig().getInt("mines.hard", 11);
+        } else {
+		    Bukkit.getLogger().log(Level.WARNING, "Please update your configuration file!");
+            Bukkit.getLogger().log(Level.WARNING, "You have to provide three numbers of mines like:");
+            Bukkit.getLogger().log(Level.WARNING, "     mines:");
+            Bukkit.getLogger().log(Level.WARNING, "       easy: 5");
+            Bukkit.getLogger().log(Level.WARNING, "       normal: 8");
+            Bukkit.getLogger().log(Level.WARNING, "       hard: 11");
+            Bukkit.getLogger().log(Level.WARNING, "Continuing with default values: 5, 8, 11");
+
+            easyBombs = 5;
+            normalBombs = 8;
+            hardBombs = 11;
+        }
+
+		if(easyBombs < 1 || normalBombs < 1  || hardBombs < 1 ){
+			if(easyBombs<1){
+				this.easyBombs = 5;
+			}
+			if(normalBombs<1){
+				this.normalBombs = 8;
+			}
+			if(hardBombs<1){
+				this.hardBombs = 11;
+			}
+		}
+		if(easyBombs > 30 || normalBombs > 30  || hardBombs > 30  ){
+			if(easyBombs> 30 ){
+				this.easyBombs = 5;
+			}
+			if(normalBombs> 30 ){
+				this.normalBombs = 8;
+			}
+			if(hardBombs> 30 ){
+				this.hardBombs = 11;
+			}
+		}
 	}
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String lable, String[] args) {
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(!sender.hasPermission("minesweeper.top")){
 			sender.sendMessage(plugin.chatColor(lang.PREFIX + lang.CMD_NO_PERM));
 			return true;	
 		}
-		int bombsNum = 0;
-		if(plugin.getConfig().isInt("mines")){
-			bombsNum = plugin.getConfig().getInt("mines");
+		String mode = "normal";
+		if(args.length == 0 || args[0].equalsIgnoreCase("normal") || args[0].equalsIgnoreCase("easy") || args[0].equalsIgnoreCase("hard") || args[0].equalsIgnoreCase("e") || args[0].equalsIgnoreCase("n") || args[0].equalsIgnoreCase("h")){
+			if(!(args.length == 0)) mode = args[0].toLowerCase();
+		} else {
+            for(String message :  lang.CMD_TOP_HELP)
+                sender.sendMessage(plugin.chatColor(lang.PREFIX + message));
+            return true;
 		}
-		if(bombsNum < 1 || bombsNum > 30){
-			bombsNum = 8;
+		int bombsNum = 0;
+		switch (mode){
+            case "e":
+                mode = "easy";
+			case "easy":
+				bombsNum = easyBombs;
+				break;
+            case "n":
+                mode = "normal";
+			case "normal":
+				bombsNum = normalBombs;
+				break;
+            case "h":
+                mode = "hard";
+			case "hard":
+				bombsNum = hardBombs;
+				break;
+			default:
+				break;
 		}
 		Map<UUID, Integer> times = new HashMap<UUID, Integer>();
 		for(String uuid : stats.getKeys(false)){
@@ -48,7 +113,7 @@ public class TopCommand implements CommandExecutor {
 			}
 		}
 		if(times.size() == 0){
-			sender.sendMessage(ChatColor.translateAlternateColorCodes('&', lang.CMD_NO_TOP_LIST));
+			sender.sendMessage(ChatColor.translateAlternateColorCodes('&', lang.PREFIX + lang.CMD_NO_TOP_LIST.replace("%mode%", mode)));
 			return true;
 		}
 		int length = (times.size() > 10? 10 : times.size());
@@ -82,7 +147,7 @@ public class TopCommand implements CommandExecutor {
 			}
 			messages[i] = structure.replaceAll("%rank%", (i+1)+"").replaceAll("%name%", name).replaceAll("%time%", minutes + ":" + seconds);
 		}
-		sender.sendMessage(ChatColor.translateAlternateColorCodes('&', lang.CMD_TOP_HEAD));
+		sender.sendMessage(ChatColor.translateAlternateColorCodes('&', lang.CMD_TOP_HEAD.replace("%mode%", mode)));
 		for(String message : messages){
 			sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
 		}

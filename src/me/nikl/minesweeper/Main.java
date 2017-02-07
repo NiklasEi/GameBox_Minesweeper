@@ -27,6 +27,7 @@ import net.milkbowl.vault.economy.Economy;
 
 public class Main extends JavaPlugin {
 
+
 	private GameManager manager;
 	private FileConfiguration config, statistics;
 	private File con, sta;

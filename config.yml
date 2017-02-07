@@ -8,8 +8,11 @@
 langFile: "lang_en.yml"
 
 
-# number of mines in the game (only integer from 1 to 30)
-mines: 8
+# number of mines in the game for each mode (only integer from 1 to 30)
+mines:
+  easy: 5
+  normal: 8
+  hard: 11
 
 rules:
   # enable/disable sound

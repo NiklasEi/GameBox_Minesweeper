@@ -1,16 +1,21 @@
 package me.nikl.minesweeper;
 
-import java.util.*;
-
 import io.netty.util.internal.ConcurrentSet;
-import org.bukkit.*;
+import me.nikl.minesweeper.nms.Update;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.DyeColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Wool;
 
-import me.nikl.minesweeper.nms.Update;
+import java.util.Arrays;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
 
 
 public class Game{
@@ -29,10 +34,7 @@ public class Game{
 	private Main plugin;
 	private GameTimer timer;
 	
-	//Map with Sounds
-	private Map<String, Sound> soundMap;
-	
-	public Game(Main plugin, UUID player){
+	public Game(Main plugin, UUID player, int bombsNum){
 		this.updater = plugin.getUpdater();
 		this.setStarted(false);
 		this.player = player;
@@ -40,18 +42,11 @@ public class Game{
 		this.num = 54;
 		this.plugin = plugin;
 		this.lang = plugin.lang;
-		this.bombsNum = 0;
+		this.bombsNum = bombsNum;
 		this.displayTime = "00:00";
 		if(plugin.getConfig() == null){
 			Bukkit.getConsoleSender().sendMessage(plugin.chatColor(lang.PREFIX + " Failed to load config!"));
 			Bukkit.getPluginManager().disablePlugin(plugin);
-		}
-		if(plugin.getConfig().isInt("mines")){
-			this.bombsNum = plugin.getConfig().getInt("mines");
-		}
-		if(bombsNum < 1 || bombsNum > 30){
-			Bukkit.getConsoleSender().sendMessage("[Minesweeper] Check the config, a not valid number of mines was set.");
-			this.bombsNum = 8;
 		}
 		if(!getMaterials()){
 			Bukkit.getConsoleSender().sendMessage(plugin.chatColor(lang.PREFIX+" &4Failed to load materials from config"));
@@ -87,11 +82,6 @@ public class Game{
 		}
 		this.inv = Bukkit.getServer().createInventory(null, num, ChatColor.translateAlternateColorCodes('&', lang.TITLE_BEGINNING));
 		createGame();
-	}
-	
-	public Game(Main plugin, UUID player, Map<String, Sound> soundMap){
-		this(plugin, player);
-		this.soundMap = soundMap;
 	}
 	
 	private Boolean getMaterials() {

@@ -3,6 +3,7 @@ package me.nikl.minesweeper;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -17,11 +18,42 @@ public class GameManager implements Listener{
 	private Main plugin;
 	private Map<UUID, Game> games;
 	private Language lang;
+	private int easyBombs, normalBombs, hardBombs;
 	
 	public GameManager(Main plugin){
 		this.games = new HashMap<>();
 		this.plugin = plugin;
 		this.lang = plugin.lang;
+
+		this.easyBombs = plugin.getConfig().getInt("mines.easy", 5);
+		this.normalBombs = plugin.getConfig().getInt("mines.normal", 8);
+		this.hardBombs = plugin.getConfig().getInt("mines.hard", 11);
+
+		if(easyBombs < 1 || normalBombs < 1  || hardBombs < 1 ){
+			Bukkit.getLogger().log(Level.WARNING, " Check the config, a too low number of mines was set.");
+			if(easyBombs<1){
+				this.easyBombs = 5;
+			}
+			if(normalBombs<1){
+				this.normalBombs = 8;
+			}
+			if(hardBombs<1){
+				this.hardBombs = 11;
+			}
+		}
+		if(easyBombs > 30 || normalBombs > 30  || hardBombs > 30  ){
+			Bukkit.getLogger().log(Level.WARNING, " Check the config, a too high number of mines was set.");
+			if(easyBombs> 30 ){
+				this.easyBombs = 5;
+			}
+			if(normalBombs> 30 ){
+				this.normalBombs = 8;
+			}
+			if(hardBombs> 30 ){
+				this.hardBombs = 11;
+			}
+		}
+
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 	
@@ -91,7 +123,30 @@ public class GameManager implements Listener{
 	
 
 	public void startGame(Player player){
-		games.put(player.getUniqueId(), new Game(plugin, player.getUniqueId()));
+		games.put(player.getUniqueId(), new Game(plugin, player.getUniqueId(), normalBombs));
+		games.get(player.getUniqueId()).showGame(player);
+	}
+
+	public void startGame(Player player, String mode){
+		switch (mode){
+			case "easy":
+				games.put(player.getUniqueId(), new Game(plugin, player.getUniqueId(), easyBombs));
+				games.get(player.getUniqueId()).showGame(player);
+				break;
+			case "hard":
+				games.put(player.getUniqueId(), new Game(plugin, player.getUniqueId(), hardBombs));
+				games.get(player.getUniqueId()).showGame(player);
+				break;
+			default:
+			case "normal":
+				games.put(player.getUniqueId(), new Game(plugin, player.getUniqueId(), normalBombs));
+				games.get(player.getUniqueId()).showGame(player);
+				break;
+		}
+	}
+
+	public void startGame(Player player, int bombsNum){
+		games.put(player.getUniqueId(), new Game(plugin, player.getUniqueId(), bombsNum));
 		games.get(player.getUniqueId()).showGame(player);
 	}
 }
