@@ -29,12 +29,15 @@ commandMessages:
   noPermission: " &4You do not have the required permission!"
   onlyAsPlayer: " &4You can only do that as a player!"
   pluginReloaded: " &aPlugin was reloaded"
-  noTopList: " &4No stats available!"
-  topListHead: "&a+ - + -  &3Minesweeper  Top 10  &a- + - +"
+  noTopList: " &4No stats available for the game mode '%mode%'!"
+  topListHead: "&a+ - + -  &3Minesweeper  Top 10  mode: %mode%  &a- + - +"
   # %rank% -> Rank of the player      %name% name of the player       %time% has the format mm:ss
   topListStructure: "%rank%. &6 %name%    &1%time%"
-  topListTail: "&a+ - + - + - + - + - + - + - + - + - +"
+  topListTail: "&a+ - + - + - + - + - + - + - + - + - + - + - + - + - +"
   # displayed when wrong arguments are used
   help:
   - " &4To start a game just do &2/mines"
+  topCmdHelp:
+  - " either use &1/mstop&r to display the 'normal' top list"
+  - " or specify the mode like this: &1/mstop <easy:normal:hard>"
   

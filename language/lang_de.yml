@@ -1,0 +1,41 @@
+# use & for colors
+#   placeholders will be listed in front of the keys
+
+# messages and inventorytitles directly related to the game
+game:
+  econ:
+    # use %cost% for the amount payed
+    payed: " &2Du hast &4%cost% gezahlt"
+    notEnoughMoney: " &4Du hast nicht genug Geld!"
+    # use %reward% for the amount the player won
+    wonMoney: " Du hast &2$%reward%&r gewonnen!"
+  inventoryTitles:
+    # displayed before the game starts
+    beginning: "Minesweeper        &2Starten"
+    # use %state% to display the number of flags and the number of mines that are left
+    #   %timer% will be replaced by the timer counting up
+    ingame: "Minesweeper     %state%   &1%timer%"
+    # use %timer% to display the time played
+    won: "Minesweeper     &2Gewonnen &1%timer%"
+    lost: "Minesweeper     &4Verloren"
+
+prefix: "&e[&3Minesweeper&e]&r"
+
+
+
+# Messages related to commands
+commandMessages:
+  noPermission: " &4Du hast keine Befugniss!"
+  onlyAsPlayer: " &4Nur als Spieler möglich!"
+  pluginReloaded: " &aPlugin wurde neu geladen"
+  noTopList: " &4Noch keine Statistik fuer den Spielmodus '%mode%' vorhanden!"
+  topListHead: "&a+ - + -  &3Minesweeper  Top 10  Modus: %mode% &a- + - +"
+  # %rank% -> Rank of the player      %name% name of the player       %time% has the format mm:ss
+  topListStructure: "&2%rank%. &6 %name%    &2Rekord: &6%time%"
+  topListTail: "&a+ - + - + - + - + - + - + - + - + - + - + - + - + - +"
+  # displayed when wrong arguments are used
+  help:
+  - " &2Starte ein Spiel mit &2/ms"
+  topCmdHelp:
+  - " benutze &1/mstop&r um die normale top list zu sehen"
+  - " oder gebe den Schwierigkeitsgrad an: &1/mstop <easy:normal:hard>"
