@@ -16,11 +16,12 @@ game:
     #   %timer% will be replaced by the timer counting up
     ingame: "Minesweeper     %state%   &1%timer%"
     # use %timer% to display the time played
-    won: "Minesweeper     &2You won in &1%timer%"
+    won: "Minesweeper   &2You won in &1%timer%"
     lost: "Minesweeper     &4You lost"
 
   
 prefix: "[&3Minesweeper&r]"
+name: "&3Minesweeper&r"
 
 
 
