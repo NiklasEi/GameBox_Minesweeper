@@ -7,17 +7,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 
-import me.nikl.minesweeper.commands.Commands;
+import me.nikl.gamebox.ClickAction;
+import me.nikl.gamebox.GameBox;
+import me.nikl.gamebox.guis.GUIManager;
+import me.nikl.gamebox.guis.button.AButton;
+import me.nikl.gamebox.guis.gui.game.GameGui;
 import me.nikl.minesweeper.commands.TopCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -41,7 +47,9 @@ public class Main extends JavaPlugin {
 	private Update updater;
 	
 	public boolean automaticReveal;
-	
+	private String gameID = "minesweeper";
+	GameBox gameBox;
+
 	@Override
 	public void onEnable(){
 
@@ -58,9 +66,10 @@ public class Main extends JavaPlugin {
 		reload();
 		if(disabled) return;
 
-		this.setManager(new GameManager(this));
-        this.getCommand("minesweeper").setExecutor(new Commands(this));
-        this.getCommand("minesweeperTop").setExecutor(new TopCommand(this));
+		hook();
+		if(disabled) return;
+
+        //this.getCommand("minesweeperTop").setExecutor(new TopCommand(this));
 	}
 	
 	private boolean setupUpdater() {
@@ -124,7 +133,174 @@ public class Main extends JavaPlugin {
     	econ = (Economy)rsp.getProvider();
     	return econ != null;
     }
-	
+
+	private void hook() {
+		if(Bukkit.getPluginManager().getPlugin("GameBox") == null){
+			Bukkit.getLogger().log(Level.SEVERE, " GameBox not found");
+			Bukkit.getPluginManager().disablePlugin(this);
+			disabled = true;
+			return;
+		}
+
+
+
+
+
+		gameBox = (me.nikl.gamebox.GameBox)Bukkit.getPluginManager().getPlugin("GameBox");
+
+		// disable economy if it is disabled for either one of the plugins
+		this.econEnabled = this.econEnabled && gameBox.getEconEnabled();
+		playSounds = playSounds && GameBox.playSounds;
+
+		GUIManager guiManager = gameBox.getPluginManager().getGuiManager();
+
+		this.manager = new GameManager(this);
+
+		gameBox.getPluginManager().registerGame(manager, gameID, lang.NAME);
+
+		GameGui gameGui = new GameGui(gameBox, guiManager, 54, gameID, "main");
+
+
+
+		Map<String, GameRules> gameTypes = new HashMap<>();
+
+		if(config.isConfigurationSection("gameBox.gameButtons")){
+			ConfigurationSection gameButtons = config.getConfigurationSection("gameBox.gameButtons");
+			ConfigurationSection buttonSec;
+			int bombsNum;
+			double cost, reward;
+
+			String displayName;
+			ArrayList<String> lore;
+
+			GameRules rules;
+
+			for(String buttonID : gameButtons.getKeys(false)){
+				buttonSec = gameButtons.getConfigurationSection(buttonID);
+
+
+				if(!buttonSec.isString("materialData")){
+					Bukkit.getLogger().log(Level.WARNING, " missing material data under: gameBox.gameButtons." + buttonID + "        can not load the button");
+					continue;
+				}
+
+				ItemStack mat = getItemStack(buttonSec.getString("materialData"));
+				if(mat == null){
+					Bukkit.getLogger().log(Level.WARNING, " error loading: gameBox.gameButtons." + buttonID);
+					Bukkit.getLogger().log(Level.WARNING, "     invalid material data");
+					continue;
+				}
+
+
+				AButton button =  new AButton(mat.getData(), 1);
+				ItemMeta meta = button.getItemMeta();
+
+				if(buttonSec.isString("displayName")){
+					displayName = chatColor(buttonSec.getString("displayName"));
+					meta.setDisplayName(displayName);
+				}
+
+				if(buttonSec.isList("lore")){
+					lore = new ArrayList<>(buttonSec.getStringList("lore"));
+					for(int i = 0; i < lore.size();i++){
+						lore.set(i, chatColor(lore.get(i)));
+					}
+					meta.setLore(lore);
+				}
+
+				button.setItemMeta(meta);
+				button.setAction(ClickAction.START_GAME);
+				button.setArgs(gameID, buttonID);
+
+				if(!buttonSec.isInt("mines")){
+					Bukkit.getLogger().log(Level.WARNING, "[Minesweeper] not specified number of mines for gameBox.gameButtons." + buttonID);
+				}
+				bombsNum = buttonSec.getInt("mines", 8);
+				cost = buttonSec.getDouble("cost", 0.);
+				reward = buttonSec.getDouble("reward", 0.);
+
+
+				rules = new GameRules(bombsNum, cost, reward);
+
+				if(buttonSec.isInt("slot")){
+					gameGui.setButton(button, buttonSec.getInt("slot"));
+				} else {
+					gameGui.setButton(button);
+				}
+
+				gameTypes.put(buttonID, rules);
+			}
+		}
+
+
+		this.manager.setGameTypes(gameTypes);
+
+
+		getMainButton:
+		if(config.isConfigurationSection("gameBox.mainButton")){
+			ConfigurationSection mainButtonSec = config.getConfigurationSection("gameBox.mainButton");
+			if(!mainButtonSec.isString("materialData")) break getMainButton;
+
+			ItemStack gameButton = getItemStack(mainButtonSec.getString("materialData"));
+			if(gameButton == null){
+				gameButton = (new ItemStack(Material.TNT));
+			}
+			ItemMeta meta = gameButton.getItemMeta();
+			meta.setDisplayName(chatColor(mainButtonSec.getString("displayName","&3Minesweeper")));
+			if(mainButtonSec.isList("lore")){
+				ArrayList<String> lore = new ArrayList<>(mainButtonSec.getStringList("lore"));
+				for(int i = 0; i < lore.size();i++){
+					lore.set(i, chatColor(lore.get(i)));
+				}
+				meta.setLore(lore);
+			}
+			gameButton.setItemMeta(meta);
+			guiManager.registerGameGUI(gameID, "main", gameGui, gameButton, "minesweeper", "ms");
+		} else {
+			Bukkit.getLogger().log(Level.WARNING, " Missing or wrong configured main button in the configuration file!");
+		}
+
+	}
+
+
+
+
+	private ItemStack getItemStack(String itemPath){
+		Material mat; short data;
+		String[] obj = itemPath.split(":");
+
+		if (obj.length == 2) {
+			try {
+				mat = Material.matchMaterial(obj[0]);
+			} catch (Exception e) {
+				return null; // material name doesn't exist
+			}
+
+			try {
+				data = Short.valueOf(obj[1]);
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+				return null; // data not a number
+			}
+
+			//noinspection deprecation
+			if(mat == null) return null;
+			ItemStack stack = new ItemStack(mat);
+			stack.setDurability(data);
+			return stack;
+		} else {
+			try {
+				mat = Material.matchMaterial(obj[0]);
+			} catch (Exception e) {
+				return null; // material name doesn't exist
+			}
+			//noinspection deprecation
+			return (mat == null ? null : new ItemStack(mat));
+		}
+	}
+    
+    
+    
 	public void reloadConfig(){
 		try { 
 			this.config = YamlConfiguration.loadConfiguration(new InputStreamReader(new FileInputStream(this.con), "UTF-8")); 
@@ -247,5 +423,9 @@ public class Main extends JavaPlugin {
 		}
 		if(!newRecord) return;
 		this.statistics.set(player.toString() + "." + bombsNum, newTime);
+	}
+
+	public String getGameID(){
+    	return this.gameID;
 	}
 }
