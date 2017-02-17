@@ -7,12 +7,48 @@
 # name of the language file (in the folder 'language')
 langFile: "lang_en.yml"
 
+gameBox:
+  mainButton:
+    # define the Material and data for the button (format: 'material:data')
+    materialData: "TNT"
+    # display name of the button
+    displayName: "&1Minesweeper"
+    # lore of the button
+    lore:
+    - ""
+    - "&3Watch your step..."
+  gameButtons:
+    easy:
+      materialData: "WOOL:13"
+      displayName: "&aEasy"
+      lore:
+      - ""
+      - "&1Mines: &r5"
+      mines: 5
+      slot: 13
+      cost: 5
+      reward: 7
+    normal:
+      materialData: "WOOL:1"
+      displayName: "&6Normal"
+      lore:
+      - ""
+      - "&1Mines: &r8"
+      mines: 8
+      cost: 10
+      reward: 15
+      slot: 22
+    hard:
+      materialData: "WOOL:14"
+      displayName: "&cHard"
+      lore:
+      - ""
+      - "&1Mines: &r11"
+      mines: 11
+      slot: 31
+      cost: 15
+      reward: 25
 
-# number of mines in the game for each mode (only integer from 1 to 30)
-mines:
-  easy: 5
-  normal: 8
-  hard: 11
 
 rules:
   # enable/disable sound
@@ -23,11 +59,10 @@ rules:
   turnOffAutomaticRevealing: false
 
 
-# requires vault
+# requires vault and an economy plugin
+#   to enable economy do not forget to enable it for GameBox too
 economy:
   enabled: false
-  cost: 0
-  reward: 0
 
   
 # you can use the section below to run commands if a player won a game
