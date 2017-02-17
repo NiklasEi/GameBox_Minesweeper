@@ -4,73 +4,52 @@ import io.netty.util.internal.ConcurrentSet;
 import me.nikl.minesweeper.nms.Update;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.DyeColor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.material.Wool;
 
-import java.util.Arrays;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
 
 public class Game{
-	private ItemStack empty, flagged, mine, covered, number;
+	private ItemStack flagged, mine, covered, number;
 	private Inventory inv;
 	private int num, bombsNum, flags;
 	private String[] positions;
 	private Boolean[] cov, flagsGrid; //Array with covered/not covered info
-	private boolean changingInv;
 	private String displayFlags, displayTime, currentState;
 	private UUID player;
 	private Language lang;
-	private boolean started;
+
+	// wait for the first click to start the timer
+	private boolean started = false;
 	private Update updater;
 	
 	private Main plugin;
 	private GameTimer timer;
+
+	private String rule;
 	
-	public Game(Main plugin, UUID player, int bombsNum){
+	public Game(Main plugin, UUID player, int bombsNum, ItemStack[] items, String rule){
 		this.updater = plugin.getUpdater();
-		this.setStarted(false);
 		this.player = player;
-		this.setChangingInv(false);
 		this.num = 54;
 		this.plugin = plugin;
+		this.rule = rule;
 		this.lang = plugin.lang;
 		this.bombsNum = bombsNum;
 		this.displayTime = "00:00";
+		this.covered = items[0];
+		this.flagged = items[1];
+		this.number = items[2];
+		this.mine = items[3];
 		if(plugin.getConfig() == null){
 			Bukkit.getConsoleSender().sendMessage(plugin.chatColor(lang.PREFIX + " Failed to load config!"));
 			Bukkit.getPluginManager().disablePlugin(plugin);
 		}
-		if(!getMaterials()){
-			Bukkit.getConsoleSender().sendMessage(plugin.chatColor(lang.PREFIX+" &4Failed to load materials from config"));
-			Bukkit.getConsoleSender().sendMessage(plugin.chatColor(lang.PREFIX+" &4Using default materials"));
-			this.flagged = new ItemStack(Material.SIGN);
-			ItemMeta metaFlagged = flagged.getItemMeta();
-			metaFlagged.setDisplayName("Flag");
-			flagged.setItemMeta(metaFlagged);
-			flagged.setAmount(1);
-			this.covered = new ItemStack(Material.STAINED_GLASS_PANE);
-			covered.setDurability((short) 8);
-			ItemMeta metaCovered = covered.getItemMeta();
-			metaCovered.setDisplayName("Cover");
-			covered.setItemMeta(metaCovered);
-			covered.setAmount(1);
-			this.mine = new ItemStack(Material.TNT);
-			ItemMeta metaMine = mine.getItemMeta();
-			metaMine.setDisplayName("Boooom");
-			mine.setItemMeta(metaMine);
-			this.number = new Wool(DyeColor.ORANGE).toItemStack();
-			ItemMeta metaNumber = number.getItemMeta();
-			metaNumber.setDisplayName("Warning");
-			number.setItemMeta(metaNumber);
-		}
+
 		this.flags=0;
 		this.positions = new String[num];
 		this.cov = new Boolean[num];
@@ -82,89 +61,15 @@ public class Game{
 		}
 		this.inv = Bukkit.getServer().createInventory(null, num, ChatColor.translateAlternateColorCodes('&', lang.TITLE_BEGINNING));
 		createGame();
-	}
-	
-	private Boolean getMaterials() {
-		Boolean worked = true;
-
-	    Material mat = null;
-	    int data = 0;
-	    for(String key : Arrays.asList("cover", "warning", "mine", "flag")){
-		    if(!plugin.getConfig().isSet("materials." + key)) return false;
-	    	String value = plugin.getConfig().getString("materials." + key);
-		    String[] obj = value.split(":");
-			String name = "default";
-			boolean named = false;
-			if(plugin.getConfig().isSet("displaynames." + key) && plugin.getConfig().isString("displaynames." + key)){
-				name = plugin.getConfig().getString("displaynames." + key);
-				named = true;
-			}
-			
-	
-		    if (obj.length == 2) {
-		        try {
-		            mat = Material.matchMaterial(obj[0]);
-		        } catch (Exception e) {
-		            worked = false; // material name doesn't exist
-		        }
-	
-		        try {
-		            data = Integer.valueOf(obj[1]);
-		        } catch (NumberFormatException e) {
-		        	worked = false; // data not a number
-		        }
-		    } else {
-		        try {
-		            mat = Material.matchMaterial(value);
-		        } catch (Exception e) {
-		            worked = false; // material name doesn't exist
-		        }
-		    }
-		    if(mat == null) return false;
-		    if(key.equals("cover")){
-				this.covered = new ItemStack(mat, 1);
-				if (obj.length == 2) covered.setDurability((short) data);
-				ItemMeta metaCovered = covered.getItemMeta();
-				metaCovered.setDisplayName("Cover");
-				if(named)
-					metaCovered.setDisplayName(plugin.chatColor(name));
-				covered.setItemMeta(metaCovered);
-				covered.setAmount(1);
-		    	
-		    } else if(key.equals("warning")){
-				this.number = new ItemStack(mat, 1);
-				if (obj.length == 2) number.setDurability((short) data);
-				ItemMeta metaNumber = number.getItemMeta();
-				metaNumber.setDisplayName("Warning");
-				if(named)
-					metaNumber.setDisplayName(plugin.chatColor(name));
-				number.setItemMeta(metaNumber);
-		    	
-		    } else if(key.equals("mine")){
-				this.mine = new ItemStack(mat, 1);
-				if (obj.length == 2) mine.setDurability((short) data);
-				ItemMeta metaMine = mine.getItemMeta();
-				metaMine.setDisplayName("Boooom");
-				if(named)
-					metaMine.setDisplayName(plugin.chatColor(name));
-				mine.setItemMeta(metaMine);
-		    	
-		    } else if(key.equals("flag")){
-				this.flagged = new ItemStack(mat, 1);
-				if (obj.length == 2) flagged.setDurability((short) data);
-				ItemMeta metaFlagged = flagged.getItemMeta();
-				metaFlagged.setDisplayName("Flag");
-				if(named)
-					metaFlagged.setDisplayName(plugin.chatColor(name));
-				flagged.setItemMeta(metaFlagged);
-				flagged.setAmount(1);		    	
-		    }
-	    }
-
-		this.empty = new ItemStack(Material.AIR);
-		return worked;
+		Player myPlayer = Bukkit.getPlayer(player);
+		if(myPlayer == null) return;
+		myPlayer.openInventory(inv);
 	}
 
+	/**
+	 * Build the grid with mines at random positions.
+	 * Then cover the inventory
+	 */
 	private void createGame(){		
 		Random r = new Random();
 		int rand = r.nextInt(num);
@@ -188,11 +93,6 @@ public class Game{
 		for(int i=0;i<num;i++){
 			this.inv.setItem(i, covered);
 		}
-		
-		
-		
-		
-		
 	}
 	
 	private String getNextMines(int i) {
@@ -223,7 +123,7 @@ public class Game{
 					Bukkit.getLogger().severe("Something went wrong while building the game");
 				}
 				if(amount == 0){
-					this.inv.setItem(i, empty);
+					this.inv.setItem(i, null);
 					continue;
 				}
 				number.setAmount(amount);
@@ -231,27 +131,13 @@ public class Game{
 			}
 		}
 	}
-	
-	public void showGame(Player player){
-		this.setChangingInv(true);
-		player.openInventory(inv);
-		this.setChangingInv(false);
-	}
-	
-	public Inventory getInv(){
-		return this.inv;
-	}
-	
+
 	public Boolean isCovered(int slot){
 		return (this.cov[slot] && !this.flagsGrid[slot]);
 	}
 	
 	public Boolean isFlagged(int slot){
 		return this.flagsGrid[slot];
-	}
-	
-	public Boolean isEmpty(int slot){
-		return inv.getItem(slot) == null;		
 	}
 
 	public void setFlagged(int slot) {
@@ -287,7 +173,7 @@ public class Game{
 				Bukkit.getLogger().severe("Something went wrong while building the game");
 			}
 			if(amount == 0){
-				this.inv.setItem(slot, empty);
+				this.inv.setItem(slot, null);
 				if(plugin.automaticReveal) {
 					uncoverEmpty(slot);
 				}
@@ -338,7 +224,7 @@ public class Game{
 				Bukkit.getLogger().severe("Something went wrong while building the game");
 			}
 			if(amount == 0){
-				this.inv.setItem(uncoverSlot, empty);
+				this.inv.setItem(uncoverSlot, null);
 			} else {
 				number.setAmount(amount);
 				this.inv.setItem(uncoverSlot, number);
@@ -398,27 +284,15 @@ public class Game{
 	public void setState(String state){
 		Player playerP = Bukkit.getPlayer(player);
 		if(playerP == null){
-			plugin.getManager().removeGame(player);
+			plugin.getManager().removeFromGame(player);
 		}
 		updater.updateTitle(Bukkit.getPlayer(player), ChatColor.translateAlternateColorCodes('&',state));
-	}
-	
-	public String getState(){
-		return inv.getName();
 	}
 
 	public void setState() {
 		this.displayFlags = "   &2"+flags+"&r/&4"+bombsNum;	
 		currentState = lang.TITLE_INGAME.replaceAll("%state%", displayFlags).replaceAll("%timer%", displayTime);
 		setState(currentState);
-	}
-
-	public boolean isChangingInv() {
-		return changingInv;
-	}
-
-	public void setChangingInv(boolean changingInv) {
-		this.changingInv = changingInv;
 	}
 
 	public void setTime(String string) {
@@ -454,5 +328,9 @@ public class Game{
 		setStarted(true);
 		startTimer();
 		setState();		
+	}
+
+	public String getRule() {
+		return rule;
 	}
 }
