@@ -24,7 +24,7 @@ public class Language {
 	public String GAME_PAYED, GAME_NOT_ENOUGH_MONEY, GAME_WON_MONEY, CMD_NO_PERM, CMD_ONLY_AS_PLAYER,
 			CMD_RELOADED, CMD_NO_TOP_LIST, CMD_TOP_HEAD, CMD_TOP_TAIL, CMD_TOP_STRUCTURE;
 	public String TITLE_BEGINNING, TITLE_INGAME, TITLE_END, TITLE_LOST;
-	public String PREFIX;
+	public String PREFIX = "[Minesweeper]", NAME = "&1Minesweeper&r";
 	public List<String> CMD_HELP, CMD_TOP_HELP;
 	private YamlConfiguration defaultLang;
 	
@@ -32,6 +32,7 @@ public class Language {
 		this.plugin = plugin;
 		getLangFile();
 		PREFIX = getString("prefix");
+		NAME = getString("name");
 		getCommandMessages();
 		getGameMessages();
 		// check for 1.8.x version
@@ -91,17 +92,26 @@ public class Language {
 
 
 	private List<String> getStringList(String path) {
+		List<String> toReturn;
 		if(!langFile.isList(path)){
-			return defaultLang.getStringList(path);
+			toReturn = defaultLang.getStringList(path);
+			for(int i = 0; i<toReturn.size(); i++){
+				toReturn.set(i, ChatColor.translateAlternateColorCodes('&',toReturn.get(i)));
+			}
+			return toReturn;
 		}
-		return langFile.getStringList(path);
+		toReturn = langFile.getStringList(path);
+		for(int i = 0; i<toReturn.size(); i++){
+			toReturn.set(i, ChatColor.translateAlternateColorCodes('&',toReturn.get(i)));
+		}
+		return toReturn;
 	}
 
 	private String getString(String path) {
 		if(!langFile.isString(path)){
-			return defaultLang.getString(path);
+			return ChatColor.translateAlternateColorCodes('&',defaultLang.getString(path));
 		}
-		return langFile.getString(path);
+		return ChatColor.translateAlternateColorCodes('&',langFile.getString(path));
 	}
 
 	private void getLangFile() {
