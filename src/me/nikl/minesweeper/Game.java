@@ -31,11 +31,15 @@ public class Game{
 	private GameTimer timer;
 
 	private String rule;
+
+	private boolean playSounds;
+	private float volume = 0.5f, pitch= 1f;
 	
-	public Game(Main plugin, UUID player, int bombsNum, ItemStack[] items, String rule){
+	public Game(Main plugin, UUID player, int bombsNum, ItemStack[] items, boolean playSounds, String rule){
 		this.updater = plugin.getUpdater();
 		this.player = player;
 		this.num = 54;
+		this.playSounds = playSounds;
 		this.plugin = plugin;
 		this.rule = rule;
 		this.lang = plugin.lang;
@@ -163,7 +167,7 @@ public class Game{
 			cancelTimer();
 			reveal();
 			Player realPlayer = Bukkit.getPlayer(player);
-			if(Main.playSounds)realPlayer.playSound(realPlayer.getLocation(), Sounds.EXPLODE.bukkitSound(), 10f, 1f);
+			if(playSounds)realPlayer.playSound(realPlayer.getLocation(), Sounds.EXPLODE.bukkitSound(), volume, pitch);
 			setState(lang.TITLE_LOST);
 		} else {
 			int amount = 0;
@@ -275,7 +279,6 @@ public class Game{
 			}
 		}
 		if(count == bombsNum){
-			plugin.setStatistics(this.player, this.displayTime, bombsNum);
 			return true;
 		}
 		return false;
@@ -332,5 +335,14 @@ public class Game{
 
 	public String getRule() {
 		return rule;
+	}
+
+	public boolean isPlaySounds() {
+		return playSounds;
+	}
+
+	public int getTimeInSeconds(){
+		if(timer == null) return -1;
+		return timer.getTime();
 	}
 }
