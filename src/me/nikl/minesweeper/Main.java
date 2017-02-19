@@ -12,10 +12,10 @@ import java.util.logging.Level;
 
 import me.nikl.gamebox.ClickAction;
 import me.nikl.gamebox.GameBox;
+import me.nikl.gamebox.data.SaveType;
 import me.nikl.gamebox.guis.GUIManager;
 import me.nikl.gamebox.guis.button.AButton;
 import me.nikl.gamebox.guis.gui.game.GameGui;
-import me.nikl.minesweeper.commands.TopCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -35,8 +35,8 @@ public class Main extends JavaPlugin {
 
 
 	private GameManager manager;
-	private FileConfiguration config, statistics;
-	private File con, sta;
+	private FileConfiguration config;
+	private File con;
 	public static Economy econ = null;
 	public static boolean playSounds = true;
 	public boolean econEnabled, wonCommandsEnabled;
@@ -47,7 +47,7 @@ public class Main extends JavaPlugin {
 	private Update updater;
 	
 	public boolean automaticReveal;
-	private String gameID = "minesweeper";
+	public static String gameID = "minesweeper";
 	GameBox gameBox;
 
 	@Override
@@ -61,7 +61,6 @@ public class Main extends JavaPlugin {
         }
         
 		this.con = new File(this.getDataFolder().toString() + File.separatorChar + "config.yml");
-		this.sta = new File(this.getDataFolder().toString() + File.separatorChar + "stats.yml");
 
 		reload();
 		if(disabled) return;
@@ -115,11 +114,6 @@ public class Main extends JavaPlugin {
 	
 	@Override
 	public void onDisable(){
-		try {
-			this.statistics.save(sta);
-		} catch (IOException e) {
-			getLogger().log(Level.SEVERE, "Could not save statistics", e);
-		}
 	}
 	
     private boolean setupEconomy(){
@@ -145,7 +139,6 @@ public class Main extends JavaPlugin {
 
 
 
-
 		gameBox = (me.nikl.gamebox.GameBox)Bukkit.getPluginManager().getPlugin("GameBox");
 
 		// disable economy if it is disabled for either one of the plugins
@@ -158,7 +151,8 @@ public class Main extends JavaPlugin {
 
 		gameBox.getPluginManager().registerGame(manager, gameID, lang.NAME);
 
-		GameGui gameGui = new GameGui(gameBox, guiManager, 54, gameID, "main");
+		int gameGuiSlots = 54;
+		GameGui gameGui = new GameGui(gameBox, guiManager, gameGuiSlots, gameID, "main");
 
 
 
@@ -169,6 +163,7 @@ public class Main extends JavaPlugin {
 			ConfigurationSection buttonSec;
 			int bombsNum;
 			double cost, reward;
+			boolean saveStats;
 
 			String displayName;
 			ArrayList<String> lore;
@@ -212,18 +207,27 @@ public class Main extends JavaPlugin {
 				button.setAction(ClickAction.START_GAME);
 				button.setArgs(gameID, buttonID);
 
+
 				if(!buttonSec.isInt("mines")){
 					Bukkit.getLogger().log(Level.WARNING, "[Minesweeper] not specified number of mines for gameBox.gameButtons." + buttonID);
 				}
 				bombsNum = buttonSec.getInt("mines", 8);
 				cost = buttonSec.getDouble("cost", 0.);
 				reward = buttonSec.getDouble("reward", 0.);
+				saveStats = buttonSec.getBoolean("saveStats", false);
 
 
-				rules = new GameRules(bombsNum, cost, reward);
+				rules = new GameRules(buttonID, bombsNum, cost, reward, saveStats);
 
+				setTheButton:
 				if(buttonSec.isInt("slot")){
-					gameGui.setButton(button, buttonSec.getInt("slot"));
+					int slot = buttonSec.getInt("slot");
+					if(slot < 0 || slot >= gameGuiSlots){
+						Bukkit.getLogger().log(Level.WARNING, "the slot of gameBox.gameButtons." + buttonID + " is out of the inventory range (0 - 53)");
+						gameGui.setButton(button);
+						break setTheButton;
+					}
+					gameGui.setButton(button, slot);
 				} else {
 					gameGui.setButton(button);
 				}
@@ -246,7 +250,7 @@ public class Main extends JavaPlugin {
 				gameButton = (new ItemStack(Material.TNT));
 			}
 			ItemMeta meta = gameButton.getItemMeta();
-			meta.setDisplayName(chatColor(mainButtonSec.getString("displayName","&3Minesweeper")));
+			meta.setDisplayName(chatColor(mainButtonSec.getString("displayName",lang.NAME)));
 			if(mainButtonSec.isList("lore")){
 				ArrayList<String> lore = new ArrayList<>(mainButtonSec.getStringList("lore"));
 				for(int i = 0; i < lore.size();i++){
@@ -260,6 +264,79 @@ public class Main extends JavaPlugin {
 			Bukkit.getLogger().log(Level.WARNING, " Missing or wrong configured main button in the configuration file!");
 		}
 
+
+		// get top list buttons
+		if(config.isConfigurationSection("gameBox.topListButtons")){
+			ConfigurationSection topListButtons = config.getConfigurationSection("gameBox.topListButtons");
+			ConfigurationSection buttonSec;
+
+			ArrayList<String> lore;
+
+
+			for(String buttonID : topListButtons.getKeys(false)){
+				buttonSec = topListButtons.getConfigurationSection(buttonID);
+
+				if(!gameTypes.keySet().contains(buttonID)){
+					Bukkit.getLogger().log(Level.WARNING, " the top list button 'gameBox.topListButtons." + buttonID + "' does not have a corresponding game button");
+					continue;
+				}
+
+
+				if(!gameTypes.get(buttonID).isSaveStats()){
+					Bukkit.getLogger().log(Level.WARNING, " the top list buttons 'gameBox.topListButtons." + buttonID + "' corresponding game button has statistics turned off!");
+					Bukkit.getLogger().log(Level.WARNING, " With these settings there is no toplist to display");
+					continue;
+				}
+
+				if(!buttonSec.isString("materialData")){
+					Bukkit.getLogger().log(Level.WARNING, " missing material data under: gameBox.topListButtons." + buttonID + "        can not load the button");
+					continue;
+				}
+
+				ItemStack mat = getItemStack(buttonSec.getString("materialData"));
+				if(mat == null){
+					Bukkit.getLogger().log(Level.WARNING, " error loading: gameBox.topListButtons." + buttonID);
+					Bukkit.getLogger().log(Level.WARNING, "     invalid material data");
+					continue;
+				}
+
+
+				AButton button =  new AButton(mat.getData(), 1);
+				ItemMeta meta = button.getItemMeta();
+
+				if(buttonSec.isString("displayName")){
+					meta.setDisplayName(chatColor(buttonSec.getString("displayName")));
+				}
+
+
+				if(buttonSec.isList("lore")){
+					lore = new ArrayList<>(buttonSec.getStringList("lore"));
+					for(int i = 0; i < lore.size();i++){
+						lore.set(i, chatColor(lore.get(i)));
+					}
+					meta.setLore(lore);
+				}
+
+				button.setItemMeta(meta);
+				button.setAction(ClickAction.SHOW_TOP_LIST);
+				button.setArgs(gameID, buttonID, SaveType.TIME_LOW.toString());
+
+
+
+				setTheButton:
+				if(buttonSec.isInt("slot")){
+					int slot = buttonSec.getInt("slot");
+					if(slot < 0 || slot >= gameGuiSlots){
+						Bukkit.getLogger().log(Level.WARNING, "the slot of gameBox.topListButtons." + buttonID + " is out of the inventory range (0 - 53)");
+						gameGui.setButton(button);
+						break setTheButton;
+					}
+					gameGui.setButton(button, slot);
+				} else {
+					gameGui.setButton(button);
+				}
+			}
+		}
 	}
 
 
@@ -309,13 +386,15 @@ public class Main extends JavaPlugin {
 		} catch (FileNotFoundException e) { 
 			e.printStackTrace(); 
 		} 
- 
+
+		/*
 		InputStream defConfigStream = this.getResource("config.yml"); 
 		if (defConfigStream != null){		
 			@SuppressWarnings("deprecation") 
 			YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream); 
 			this.config.setDefaults(defConfig); 
-		} 
+		}
+		*/
 	} 
 	
 	public GameManager getManager() {
@@ -326,23 +405,9 @@ public class Main extends JavaPlugin {
 		if(!con.exists()){
 			this.saveResource("config.yml", false);
 		}
-		if(!sta.exists()){
-			try {
-				sta.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
 		reloadConfig();
 		
 		this.lang = new Language(this);
-		
-		// load stats file
-		try {
-			this.statistics = YamlConfiguration.loadConfiguration(new InputStreamReader(new FileInputStream(this.sta), "UTF-8"));
-		} catch (UnsupportedEncodingException | FileNotFoundException e) {
-			e.printStackTrace();
-		}
 		
 		this.wonCommandsEnabled = false;
 		this.wonCommands = new ArrayList<>();
@@ -379,10 +444,6 @@ public class Main extends JavaPlugin {
 			}
 		}
 	}
-	
-	public FileConfiguration getStatistics(){
-		return this.statistics;
-	}
 
 	public void setManager(GameManager manager) {
 		this.manager = manager;
@@ -408,24 +469,11 @@ public class Main extends JavaPlugin {
     	return this.price;
     }
 
-	public void setStatistics(UUID player, String displayTime, int bombsNum) {
-		if(this.statistics == null) return;
-		String[] timeSplit = displayTime.split(":");
-		int newTime = Integer.parseInt(timeSplit[0])*60 + Integer.parseInt(timeSplit[1]);
-		if(!statistics.isInt(player.toString() + "." + bombsNum)){
-			statistics.set(player.toString() + "." + bombsNum, newTime);
-			return;
-		}
-		boolean newRecord = false;
-		int oldTime = statistics.getInt(player.toString() + "." + bombsNum);
-		if(newTime < oldTime){
-			newRecord = true;
-		}
-		if(!newRecord) return;
-		this.statistics.set(player.toString() + "." + bombsNum, newTime);
-	}
-
 	public String getGameID(){
     	return this.gameID;
+	}
+
+	public GameBox getGameBox(){
+		return  this.gameBox;
 	}
 }
