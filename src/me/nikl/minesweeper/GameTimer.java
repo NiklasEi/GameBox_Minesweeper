@@ -25,4 +25,8 @@ public class GameTimer extends BukkitRunnable{
 		
 		game.setTime(minutes + ":" + seconds);		
 	}
+
+	public int getTime(){
+		return this.time;
+	}
 }
