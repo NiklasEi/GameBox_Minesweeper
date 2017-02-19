@@ -19,9 +19,9 @@ game:
     won: "Minesweeper   &2You won in &1%timer%"
     lost: "Minesweeper     &4You lost"
 
-  
+
 prefix: "[&3Minesweeper&r]"
-name: "&3Minesweeper&r"
+name: "&1Minesweeper&r"
 
 
 
