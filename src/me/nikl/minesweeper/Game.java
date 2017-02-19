@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Level;
 
 
 public class Game{
@@ -81,7 +80,7 @@ public class Game{
 			cov[i]=true;
 			flagsGrid[i] = false;
 		}
-		this.inv = Bukkit.getServer().createInventory(Bukkit.getPlayer(player), num, ChatColor.translateAlternateColorCodes('&', lang.TITLE_BEGINNING));
+		this.inv = Bukkit.getServer().createInventory(null, num, ChatColor.translateAlternateColorCodes('&', lang.TITLE_BEGINNING));
 		createGame();
 	}
 	
@@ -189,6 +188,11 @@ public class Game{
 		for(int i=0;i<num;i++){
 			this.inv.setItem(i, covered);
 		}
+		
+		
+		
+		
+		
 	}
 	
 	private String getNextMines(int i) {
@@ -394,10 +398,7 @@ public class Game{
 	public void setState(String state){
 		Player playerP = Bukkit.getPlayer(player);
 		if(playerP == null){
-			Bukkit.getLogger().severe("Player null! removing the game.");
-			Bukkit.getConsoleSender().sendMessage("Player null! removing the game.");
 			plugin.getManager().removeGame(player);
-			return;
 		}
 		updater.updateTitle(Bukkit.getPlayer(player), ChatColor.translateAlternateColorCodes('&',state));
 	}

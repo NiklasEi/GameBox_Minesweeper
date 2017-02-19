@@ -12,7 +12,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryType;
 
 public class GameManager implements Listener{
 
@@ -119,7 +118,6 @@ public class GameManager implements Listener{
 	}
 	
 	public void removeGame(UUID player){
-		games.get(player).cancelTimer();
 		games.remove(player);
 	}
 	
@@ -127,13 +125,6 @@ public class GameManager implements Listener{
 	public void startGame(Player player){
 		games.put(player.getUniqueId(), new Game(plugin, player.getUniqueId(), normalBombs));
 		games.get(player.getUniqueId()).showGame(player);
-		if(player.getOpenInventory().getType() == InventoryType.CRAFTING) {
-			Bukkit.getConsoleSender().sendMessage(lang.PREFIX + " the inventory did not open... canceling the game");
-			games.get(player.getUniqueId()).cancelTimer();
-			games.remove(player.getUniqueId());
-		} else {
-			Bukkit.getConsoleSender().sendMessage(lang.PREFIX + " top inv. is ok");
-		}
 	}
 
 	public void startGame(Player player, String mode){
