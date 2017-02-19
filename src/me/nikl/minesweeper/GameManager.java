@@ -6,6 +6,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import me.nikl.gamebox.Permissions;
+import me.nikl.gamebox.data.SaveType;
+import me.nikl.gamebox.data.Statistics;
 import me.nikl.gamebox.game.IGameManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -27,13 +30,16 @@ public class GameManager implements IGameManager{
 	private ItemStack covered, flagged, mine, number;
 	private ItemStack[] items;
 
+	private Statistics statistics;
+
 	private Map<String,GameRules> gameTypes;
 
-	private float volume = 0.5f;
+	private float volume = 0.5f, pitch = 1f;
 
 	public GameManager(Main plugin){
 		this.games = new HashMap<>();
 		this.plugin = plugin;
+		this.statistics = plugin.getGameBox().getStatistics();
 		this.lang = plugin.lang;
 
 		if(!getMaterials()){
@@ -160,32 +166,36 @@ public class GameManager implements IGameManager{
 		if(game.isCovered(slot)){
 			if(event.getAction().equals(InventoryAction.PICKUP_HALF)){
 				game.setFlagged(slot);
-				if(Main.playSounds)player.playSound(player.getLocation(), Sounds.CLICK.bukkitSound(), volume, 1f);
+				if(game.isPlaySounds())player.playSound(player.getLocation(), Sounds.CLICK.bukkitSound(), volume, pitch);
 			} else if (event.getAction().equals(InventoryAction.PICKUP_ALL)){
 				game.uncover(slot);
 				if(game.isWon()){
+					int finalTime = game.getTimeInSeconds();
 					game.cancelTimer();
 					game.reveal();
 					game.setState(lang.TITLE_END.replaceAll("%timer%", game.getDisplayTime()+""));
-					if(Main.playSounds)player.playSound(player.getLocation(), Sounds.LEVEL_UP.bukkitSound(), volume, 1f);
-					if(plugin.econEnabled && !event.getWhoClicked().hasPermission("gamebox.bypass") && !event.getWhoClicked().hasPermission("gamebox.bypass." + plugin.getGameID()) && gameTypes.get(game.getRule()).getReward() > 0.0){
+					if(game.isPlaySounds())player.playSound(player.getLocation(), Sounds.LEVEL_UP.bukkitSound(), volume, pitch);
+					if(plugin.econEnabled && !event.getWhoClicked().hasPermission(Permissions.BYPASS_ALL.getPermission()) && !event.getWhoClicked().hasPermission(Permissions.BYPASS_GAME.getPermission(Main.gameID)) && gameTypes.get(game.getRule()).getReward() > 0.0){
 						Main.econ.depositPlayer(player, gameTypes.get(game.getRule()).getReward());
 						player.sendMessage(plugin.chatColor(lang.PREFIX + lang.GAME_WON_MONEY.replaceAll("%reward%", plugin.getReward()+"")));
 					}
-					if(plugin.wonCommandsEnabled && !event.getWhoClicked().hasPermission("gamebox.bypass") && !event.getWhoClicked().hasPermission("gamebox.bypass." + plugin.getGameID())){
+					if(plugin.wonCommandsEnabled && !event.getWhoClicked().hasPermission(Permissions.BYPASS_ALL.getPermission()) && !event.getWhoClicked().hasPermission(Permissions.BYPASS_GAME.getPermission(Main.gameID))){
 						if(plugin.wonCommands != null && !plugin.wonCommands.isEmpty()) {
 							for (String cmd : plugin.wonCommands) {
 								Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", player.getName()));
 							}
 						}
 					}
+					if(gameTypes.get(game.getRule()).isSaveStats()){
+						statistics.addStatistics(player.getUniqueId(), Main.gameID, gameTypes.get(game.getRule()).getKey(), (double) finalTime, SaveType.TIME_LOW);
+					}
 				} else {
-					if(Main.playSounds)player.playSound(player.getLocation(), Sounds.CLICK.bukkitSound(), volume, 1f);
+					if(game.isPlaySounds())player.playSound(player.getLocation(), Sounds.CLICK.bukkitSound(), volume, pitch);
 				}
 			}
 		} else if(game.isFlagged(slot) && event.getAction().equals(InventoryAction.PICKUP_HALF)){
 			game.deFlag(slot);
-			if(Main.playSounds)player.playSound(player.getLocation(), Sounds.CLICK.bukkitSound(), volume, 1f);
+			if(game.isPlaySounds())player.playSound(player.getLocation(), Sounds.CLICK.bukkitSound(), volume, pitch);
 		}
 		return true;
 	}
@@ -205,7 +215,7 @@ public class GameManager implements IGameManager{
 	}
 
 	@Override
-	public boolean startGame(Player[] players, String... strings) {
+	public boolean startGame(Player[] players, boolean playSounds, String... strings) {
 		// first and only argument atm is the number of bombs
 		if(strings.length != 1){
 			Bukkit.getLogger().log(Level.WARNING, " unknown number of arguments to start a game: " + Arrays.asList(strings));
@@ -216,7 +226,10 @@ public class GameManager implements IGameManager{
 			Bukkit.getLogger().log(Level.WARNING, " unknown argument to start a game: " + Arrays.asList(strings));
 			return false;
 		}
-		games.put(players[0].getUniqueId(), new Game(plugin, players[0].getUniqueId(), rule.getNumberOfBombs(), items, strings[0]));
+		if(!pay(players, rule.getCost())){
+			return false;
+		}
+		games.put(players[0].getUniqueId(), new Game(plugin, players[0].getUniqueId(), rule.getNumberOfBombs(), items, (Main.playSounds && playSounds), strings[0]));
 		return true;
 	}
 
@@ -228,5 +241,22 @@ public class GameManager implements IGameManager{
 
 	public void setGameTypes(Map<String,GameRules> gameTypes) {
 		this.gameTypes = gameTypes;
+	}
+
+
+
+	private boolean pay(Player[] player, double cost) {
+		if (plugin.getEconEnabled() && !player[0].hasPermission(Permissions.BYPASS_ALL.getPermission()) && !player[0].hasPermission(Permissions.BYPASS_GAME.getPermission(Main.gameID)) && cost > 0.0) {
+			if (Main.econ.getBalance(player[0]) >= cost) {
+				Main.econ.withdrawPlayer(player[0], cost);
+				player[0].sendMessage(plugin.chatColor(lang.PREFIX + plugin.lang.GAME_PAYED.replaceAll("%cost%", String.valueOf(cost))));
+				return true;
+			} else {
+				player[0].sendMessage(plugin.chatColor(lang.PREFIX + plugin.lang.GAME_NOT_ENOUGH_MONEY));
+				return false;
+			}
+		} else {
+			return true;
+		}
 	}
 }
