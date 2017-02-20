@@ -16,6 +16,7 @@ import me.nikl.gamebox.data.SaveType;
 import me.nikl.gamebox.guis.GUIManager;
 import me.nikl.gamebox.guis.button.AButton;
 import me.nikl.gamebox.guis.gui.game.GameGui;
+import me.nikl.gamebox.guis.gui.game.TopListPage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -319,7 +320,7 @@ public class Main extends JavaPlugin {
 
 				button.setItemMeta(meta);
 				button.setAction(ClickAction.SHOW_TOP_LIST);
-				button.setArgs(gameID, buttonID, SaveType.TIME_LOW.toString());
+				button.setArgs(gameID, buttonID + GUIManager.TOP_LIST_KEY_ADDON);
 
 
 
@@ -335,6 +336,20 @@ public class Main extends JavaPlugin {
 				} else {
 					gameGui.setButton(button);
 				}
+
+				// get skull lore and pass on to the top list page
+				if(buttonSec.isList("skullLore")){
+					lore = new ArrayList<>(buttonSec.getStringList("skullLore"));
+					for(int i = 0; i < lore.size();i++){
+						lore.set(i, chatColor(lore.get(i)));
+					}
+				} else {
+					lore = new ArrayList<>(Arrays.asList("", "No lore specified in the config!"));
+				}
+
+				TopListPage topListPage = new TopListPage(gameBox, guiManager, 54, gameID, buttonID + GUIManager.TOP_LIST_KEY_ADDON, buttonSec.isString("inventoryTitle")? ChatColor.translateAlternateColorCodes('&',buttonSec.getString("inventoryTitle")):"Title missing in config", SaveType.TIME_LOW, lore);
+
+				guiManager.registerTopList(gameID, buttonID, topListPage);
 			}
 		}
 	}
