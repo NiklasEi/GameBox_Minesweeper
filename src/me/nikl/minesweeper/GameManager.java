@@ -131,7 +131,7 @@ public class GameManager implements IGameManager{
 				this.mine = new ItemStack(mat, 1);
 				if (obj.length == 2) mine.setDurability((short) data);
 				ItemMeta metaMine = mine.getItemMeta();
-				metaMine.setDisplayName("Boooom");
+				metaMine.setDisplayName("&4Mine");
 				if(named)
 					metaMine.setDisplayName(plugin.chatColor(name));
 				mine.setItemMeta(metaMine);
