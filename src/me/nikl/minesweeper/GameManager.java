@@ -177,7 +177,7 @@ public class GameManager implements IGameManager{
 					if(game.isPlaySounds())player.playSound(player.getLocation(), Sounds.LEVEL_UP.bukkitSound(), volume, pitch);
 					if(plugin.econEnabled && !event.getWhoClicked().hasPermission(Permissions.BYPASS_ALL.getPermission()) && !event.getWhoClicked().hasPermission(Permissions.BYPASS_GAME.getPermission(Main.gameID)) && gameTypes.get(game.getRule()).getReward() > 0.0){
 						Main.econ.depositPlayer(player, gameTypes.get(game.getRule()).getReward());
-						player.sendMessage(plugin.chatColor(lang.PREFIX + lang.GAME_WON_MONEY.replaceAll("%reward%", plugin.getReward()+"")));
+						player.sendMessage(plugin.chatColor(lang.PREFIX + lang.GAME_WON_MONEY.replaceAll("%reward%", gameTypes.get(game.getRule()).getReward()+"")));
 					}
 					if(plugin.wonCommandsEnabled && !event.getWhoClicked().hasPermission(Permissions.BYPASS_ALL.getPermission()) && !event.getWhoClicked().hasPermission(Permissions.BYPASS_GAME.getPermission(Main.gameID))){
 						if(plugin.wonCommands != null && !plugin.wonCommands.isEmpty()) {
