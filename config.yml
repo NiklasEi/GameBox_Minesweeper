@@ -24,6 +24,8 @@ gameBox:
       lore:
       - ""
       - "&1Mines: &r5"
+      - "&1Cost: &45"
+      - "&1Reward: &a7"
       mines: 5
       slot: 11
       cost: 5
@@ -34,6 +36,8 @@ gameBox:
       lore:
       - ""
       - "&1Mines: &r8"
+      - "&1Cost: &410"
+      - "&1Reward: &a15"
       mines: 8
       cost: 10
       reward: 15
@@ -44,6 +48,8 @@ gameBox:
       lore:
       - ""
       - "&1Mines: &r11"
+      - "&1Cost: &415"
+      - "&1Reward: &a25"
       mines: 11
       slot: 29
       cost: 15
@@ -54,8 +60,11 @@ gameBox:
       lore:
       - ""
       - "&1Mines: &r11"
-      - "Your best score will be saved"
+      - "&cClimb up the &ltop list"
       - "&aGood luck!"
+      - ""
+      - "&1Cost: &450"
+      - "&1Reward: &a75"
       mines: 11
       slot: 24
       cost: 50
@@ -70,10 +79,10 @@ gameBox:
       displayName: "&cTop list"
       lore:
       - ""
-      - "&1Show top list for '&cCompetition'"
+      - "&cCompetition &1top list"
       slot: 33
       # inventory title of the top list (%player% and %game%)
-      inventoryTitle: '%game% Top List'
+      inventoryTitle: '              Top List'
       # Lore of the skulls in the inventory. Use %rank% for the rank and %time% for the time in 'mm:ss'
       skullLore:
       - ''
