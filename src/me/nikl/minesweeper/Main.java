@@ -42,7 +42,6 @@ public class Main extends JavaPlugin {
 	public static boolean playSounds = true;
 	public boolean econEnabled, wonCommandsEnabled;
 	public List<String> wonCommands;
-	public Double reward, price;
 	public Language lang;
 	public boolean disabled;
 	private Update updater;
@@ -450,13 +449,6 @@ public class Main extends JavaPlugin {
 				disabled = true;
 				return;
 			}
-			
-			this.price = getConfig().getDouble("economy.cost");
-			this.reward = getConfig().getDouble("economy.reward");
-			if(price == null || reward == null || price < 0. || reward < 0.){
-				Bukkit.getConsoleSender().sendMessage(chatColor(lang.PREFIX + " &4Wrong configuration in section economy!"));
-				getServer().getPluginManager().disablePlugin(this);
-			}
 		}
 	}
 
@@ -474,14 +466,6 @@ public class Main extends JavaPlugin {
     
     public Boolean getEconEnabled(){
     	return this.econEnabled;
-    }
-    
-    public Double getReward(){
-    	return this.reward;
-    }
-    
-    public Double getPrice(){
-    	return this.price;
     }
 
 	public String getGameID(){
