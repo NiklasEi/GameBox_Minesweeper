@@ -149,7 +149,7 @@ public class Main extends JavaPlugin {
 
 		this.manager = new GameManager(this);
 
-		gameBox.getPluginManager().registerGame(manager, gameID, lang.NAME);
+		gameBox.getPluginManager().registerGame(manager, gameID, lang.NAME, 1);
 
 		int gameGuiSlots = 54;
 		GameGui gameGui = new GameGui(gameBox, guiManager, gameGuiSlots, gameID, "main");
