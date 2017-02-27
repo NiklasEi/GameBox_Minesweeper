@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import me.nikl.gamebox.GameBox;
 import me.nikl.gamebox.Permissions;
 import me.nikl.gamebox.data.SaveType;
 import me.nikl.gamebox.data.Statistics;
@@ -215,22 +216,22 @@ public class GameManager implements IGameManager{
 	}
 
 	@Override
-	public boolean startGame(Player[] players, boolean playSounds, String... strings) {
+	public int startGame(Player[] players, boolean playSounds, String... strings) {
 		// first and only argument atm is the number of bombs
 		if(strings.length != 1){
 			Bukkit.getLogger().log(Level.WARNING, " unknown number of arguments to start a game: " + Arrays.asList(strings));
-			return false;
+			return GameBox.GAME_NOT_STARTED_ERROR;
 		}
 		GameRules rule = gameTypes.get(strings[0]);
 		if(rule == null){
 			Bukkit.getLogger().log(Level.WARNING, " unknown argument to start a game: " + Arrays.asList(strings));
-			return false;
+			return GameBox.GAME_NOT_STARTED_ERROR;
 		}
 		if(!pay(players, rule.getCost())){
-			return false;
+			return GameBox.GAME_NOT_ENOUGH_MONEY;
 		}
 		games.put(players[0].getUniqueId(), new Game(plugin, players[0].getUniqueId(), rule.getNumberOfBombs(), items, (Main.playSounds && playSounds), strings[0]));
-		return true;
+		return GameBox.GAME_STARTED;
 	}
 
 	@Override
