@@ -153,7 +153,7 @@ public class Main extends JavaPlugin {
 
 		int gameGuiSlots = 54;
 		GameGui gameGui = new GameGui(gameBox, guiManager, gameGuiSlots, gameID, "main");
-
+		gameGui.setHelpButton(lang.GAME_HELP);
 
 
 		Map<String, GameRules> gameTypes = new HashMap<>();
@@ -396,9 +396,11 @@ public class Main extends JavaPlugin {
 		try { 
 			this.config = YamlConfiguration.loadConfiguration(new InputStreamReader(new FileInputStream(this.con), "UTF-8")); 
 		} catch (UnsupportedEncodingException e) { 
-			e.printStackTrace(); 
+			e.printStackTrace();
+			disabled = true;
 		} catch (FileNotFoundException e) { 
-			e.printStackTrace(); 
+			e.printStackTrace();
+			disabled = true;
 		} 
 
 		/*
