@@ -23,6 +23,18 @@ game:
 prefix: "[&3Minesweeper&r]"
 name: "&1Minesweeper&r"
 
+gameHelp:
+  - '&1&lMinesweeper is about logic and some math ;)'
+  - '&1&lUncover a slot with left click'
+  - '  &1&lIt can either be empty, a mine or a warning'
+  - '  &1&lWarnings indicate the number of mines'
+  - '    &1&lin the 8 neighboring slots'
+  - '  &1&lWhen you uncover a mine you lost'
+  - '&1&lThe goal is to uncover all slots '
+  - '  &1&lexcept the mines'
+  - '&1&lFlag slots with right click'
+  - '  &1&lWhen you are sure that they cover a mine'
+  - '  &1&lYou can uncover them again with right click'
 
 
 # Messages related to commands

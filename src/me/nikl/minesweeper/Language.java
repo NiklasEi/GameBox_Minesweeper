@@ -25,7 +25,7 @@ public class Language {
 			CMD_RELOADED, CMD_NO_TOP_LIST, CMD_TOP_HEAD, CMD_TOP_TAIL, CMD_TOP_STRUCTURE;
 	public String TITLE_BEGINNING, TITLE_INGAME, TITLE_END, TITLE_LOST;
 	public String PREFIX = "[Minesweeper]", NAME = "&1Minesweeper&r";
-	public List<String> CMD_HELP, CMD_TOP_HELP;
+	public List<String> CMD_HELP, CMD_TOP_HELP, GAME_HELP;
 	private YamlConfiguration defaultLang;
 	
 	public Language(Main plugin){
@@ -69,6 +69,8 @@ public class Language {
 		GAME_PAYED = getString("game.econ.payed");
 		GAME_NOT_ENOUGH_MONEY = getString("game.econ.notEnoughMoney");
 		GAME_WON_MONEY = getString("game.econ.wonMoney");
+
+		this.GAME_HELP = getStringList("gameHelp");
 		
 		TITLE_BEGINNING = getString("game.inventoryTitles.beginning");
 		TITLE_INGAME = getString("game.inventoryTitles.ingame");
