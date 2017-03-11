@@ -180,13 +180,6 @@ public class GameManager implements IGameManager{
 						Main.econ.depositPlayer(player, gameTypes.get(game.getRule()).getReward());
 						player.sendMessage(plugin.chatColor(lang.PREFIX + lang.GAME_WON_MONEY.replaceAll("%reward%", gameTypes.get(game.getRule()).getReward()+"")));
 					}
-					if(plugin.wonCommandsEnabled && !event.getWhoClicked().hasPermission(Permissions.BYPASS_ALL.getPermission()) && !event.getWhoClicked().hasPermission(Permissions.BYPASS_GAME.getPermission(Main.gameID))){
-						if(plugin.wonCommands != null && !plugin.wonCommands.isEmpty()) {
-							for (String cmd : plugin.wonCommands) {
-								Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", player.getName()));
-							}
-						}
-					}
 					if(gameTypes.get(game.getRule()).isSaveStats()){
 						statistics.addStatistics(player.getUniqueId(), Main.gameID, gameTypes.get(game.getRule()).getKey(), (double) finalTime, SaveType.TIME_LOW);
 					}
