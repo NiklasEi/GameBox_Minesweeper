@@ -2,4 +2,5 @@ name: Minesweeper
 author: Nikl
 main: me.nikl.minesweeper.Main
 version: 2.0.0
+website: nikl.me
 depend: [GameBox]
