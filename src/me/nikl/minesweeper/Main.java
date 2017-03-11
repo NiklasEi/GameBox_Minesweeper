@@ -40,8 +40,7 @@ public class Main extends JavaPlugin {
 	private File con;
 	public static Economy econ = null;
 	public static boolean playSounds = true;
-	public boolean econEnabled, wonCommandsEnabled;
-	public List<String> wonCommands;
+	public boolean econEnabled;
 	public Language lang;
 	public boolean disabled;
 	private Update updater;
@@ -424,13 +423,6 @@ public class Main extends JavaPlugin {
 		reloadConfig();
 		
 		this.lang = new Language(this);
-		
-		this.wonCommandsEnabled = false;
-		this.wonCommands = new ArrayList<>();
-		if(this.config.isBoolean("wonCommands.enabled")){
-			this.wonCommandsEnabled = config.getBoolean("wonCommands.enabled");
-			this.wonCommands = config.getStringList("wonCommands.commands");
-		}
 		
 		this.automaticReveal = true;
 		if(config.getBoolean("rules.turnOffAutomaticRevealing")){
