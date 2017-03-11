@@ -104,16 +104,6 @@ rules:
 economy:
   enabled: false
 
-  
-# you can use the section below to run commands if a player won a game
-#   %player% will be replaced by the players name
-wonCommands:
-  enabled: false
-  # commands to dispatch after a player won a game
-  commands:
-  - "tell %player% [Minesweeper] You won a diamond"
-  - "give %player% diamond 1"
-
 
 # use "Material:data" or "ID:data"
 materials:
