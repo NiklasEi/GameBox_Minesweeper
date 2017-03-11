@@ -21,11 +21,10 @@ public class Language {
 	private Main plugin;
 	private FileConfiguration langFile;
 	
-	public String GAME_PAYED, GAME_NOT_ENOUGH_MONEY, GAME_WON_MONEY, CMD_NO_PERM, CMD_ONLY_AS_PLAYER,
-			CMD_RELOADED, CMD_NO_TOP_LIST, CMD_TOP_HEAD, CMD_TOP_TAIL, CMD_TOP_STRUCTURE;
+	public String GAME_PAYED, GAME_NOT_ENOUGH_MONEY, GAME_WON_MONEY;
 	public String TITLE_BEGINNING, TITLE_INGAME, TITLE_END, TITLE_LOST;
 	public String PREFIX = "[Minesweeper]", NAME = "&1Minesweeper&r";
-	public List<String> CMD_HELP, CMD_TOP_HELP, GAME_HELP;
+	public List<String> GAME_HELP;
 	private YamlConfiguration defaultLang;
 	
 	public Language(Main plugin){
@@ -33,7 +32,6 @@ public class Language {
 		getLangFile();
 		PREFIX = getString("prefix");
 		NAME = getString("name");
-		getCommandMessages();
 		getGameMessages();
 		// check for 1.8.x version
 		// if this is the version of the server check the length of the titles and shorten them if necessary
@@ -76,20 +74,6 @@ public class Language {
 		TITLE_INGAME = getString("game.inventoryTitles.ingame");
 		TITLE_END = getString("game.inventoryTitles.won");
 		TITLE_LOST = getString("game.inventoryTitles.lost");
-	}
-
-	private void getCommandMessages() {
-		CMD_NO_PERM = getString("commandMessages.noPermission");
-		CMD_ONLY_AS_PLAYER = getString("commandMessages.onlyAsPlayer");
-		CMD_RELOADED = getString("commandMessages.pluginReloaded");
-		
-		CMD_NO_TOP_LIST = getString("commandMessages.noTopList");
-		CMD_TOP_HEAD = getString("commandMessages.topListHead");
-		CMD_TOP_TAIL = getString("commandMessages.topListTail");
-		CMD_TOP_STRUCTURE = getString("commandMessages.topListStructure");
-
-		this.CMD_HELP = getStringList("commandMessages.help");
-		this.CMD_TOP_HELP = getStringList("commandMessages.topCmdHelp");
 	}
 
 
