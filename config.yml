@@ -50,10 +50,12 @@ gameBox:
       - "&1Mines: &r11"
       - "&1Cost: &415"
       - "&1Reward: &a25"
+      - "&1Tokens: &a1"
       mines: 11
       slot: 29
       cost: 15
       reward: 25
+      token: 1
     saveStats:
       materialData: "diamond_block"
       displayName: "&c&lCompetition"
@@ -65,12 +67,14 @@ gameBox:
       - ""
       - "&1Cost: &450"
       - "&1Reward: &a75"
+      - "&1Tokens: &a3"
       mines: 11
       slot: 24
       cost: 50
       reward: 75
       # if true the best score of this button is saved
       saveStats: true
+      token: 3
   topListButtons:
     # use the same key as the game you want to display the top list for
     #   for that button 'saveStats' must be true (see above)
