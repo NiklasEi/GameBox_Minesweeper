@@ -49,6 +49,12 @@ public class Main extends JavaPlugin {
 	public static String gameID = "minesweeper";
 	GameBox gameBox;
 
+	private final String[][] depends =  new String[][]{
+			new String[]{"Vault", "1.5"},
+			new String[]{"GameBox", "1.0.1"}
+	};
+
+
 	@Override
 	public void onEnable(){
 
@@ -128,7 +134,7 @@ public class Main extends JavaPlugin {
     }
 
 	private void hook() {
-		if(Bukkit.getPluginManager().getPlugin("GameBox") == null){
+		if(Bukkit.getPluginManager().getPlugin("GameBox") == null || !Bukkit.getPluginManager().getPlugin("GameBox").isEnabled()){
 			Bukkit.getLogger().log(Level.SEVERE, " GameBox not found");
 			Bukkit.getPluginManager().disablePlugin(this);
 			disabled = true;
@@ -136,9 +142,33 @@ public class Main extends JavaPlugin {
 		}
 
 
-
-
 		gameBox = (me.nikl.gamebox.GameBox)Bukkit.getPluginManager().getPlugin("GameBox");
+
+		String[] versionString = gameBox.getDescription().getVersion().split("\\.");
+		String[] minVersionString = depends[1][1].split("\\.");
+		Integer[] version = new Integer[versionString.length];
+		Integer[] minVersion = new Integer[minVersionString.length];
+
+		for(int i = 0; i < minVersionString.length; i++){
+			try {
+				minVersion[i] = Integer.valueOf(minVersionString[i]);
+				version[i] = Integer.valueOf(versionString[i]);
+			} catch (NumberFormatException exception){
+				exception.printStackTrace();
+			}
+		}
+
+		for(int i = 0; i < minVersion.length; i++){
+			if(minVersion[i] < version[i]) break;
+			if(minVersion[i].equals(version[i])) continue;
+
+			Bukkit.getLogger().log(Level.WARNING, " Your GameBox is outdated!");
+			Bukkit.getLogger().log(Level.WARNING, " You need at least version " + depends[1][1]);
+			Bukkit.getPluginManager().disablePlugin(this);
+			disabled = true;
+			return;
+		}
+
 
 		// disable economy if it is disabled for either one of the plugins
 		this.econEnabled = this.econEnabled && gameBox.getEconEnabled();
@@ -160,7 +190,7 @@ public class Main extends JavaPlugin {
 		if(config.isConfigurationSection("gameBox.gameButtons")){
 			ConfigurationSection gameButtons = config.getConfigurationSection("gameBox.gameButtons");
 			ConfigurationSection buttonSec;
-			int bombsNum;
+			int bombsNum, tokens;
 			double cost, reward;
 			boolean saveStats;
 
@@ -213,10 +243,11 @@ public class Main extends JavaPlugin {
 				bombsNum = buttonSec.getInt("mines", 8);
 				cost = buttonSec.getDouble("cost", 0.);
 				reward = buttonSec.getDouble("reward", 0.);
+				tokens = buttonSec.getInt("tokens", 0);
 				saveStats = buttonSec.getBoolean("saveStats", false);
 
 
-				rules = new GameRules(buttonID, bombsNum, cost, reward, saveStats);
+				rules = new GameRules(buttonID, bombsNum, cost, reward, tokens, saveStats);
 
 				setTheButton:
 				if(buttonSec.isInt("slot")){
