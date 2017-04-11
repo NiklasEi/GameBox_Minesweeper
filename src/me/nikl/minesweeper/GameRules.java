@@ -5,17 +5,18 @@ package me.nikl.minesweeper;
  */
 public class GameRules {
 
-    private int numberOfBombs;
+    private int numberOfBombs, tokens;
     private double cost, reward;
     private boolean saveStats;
     private String key;
 
-    public GameRules(String key, int bombsNum, double cost, double reward, boolean saveStats){
+    public GameRules(String key, int bombsNum, double cost, double reward, int tokens, boolean saveStats){
         this.numberOfBombs = bombsNum;
         this.cost = cost;
         this.reward = reward;
         this.saveStats = saveStats;
         this.key = key;
+        this.tokens = tokens;
     }
 
     public int getNumberOfBombs() {
@@ -36,5 +37,9 @@ public class GameRules {
 
     public String getKey() {
         return key;
+    }
+
+    public int getTokens() {
+        return tokens;
     }
 }
