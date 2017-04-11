@@ -175,13 +175,17 @@ public class GameManager implements IGameManager{
 					game.cancelTimer();
 					game.reveal();
 					game.setState(lang.TITLE_END.replaceAll("%timer%", game.getDisplayTime()+""));
+					GameRules gameType = gameTypes.get(game.getRule());
 					if(game.isPlaySounds())player.playSound(player.getLocation(), Sounds.LEVEL_UP.bukkitSound(), volume, pitch);
 					if(plugin.econEnabled && !event.getWhoClicked().hasPermission(Permissions.BYPASS_ALL.getPermission()) && !event.getWhoClicked().hasPermission(Permissions.BYPASS_GAME.getPermission(Main.gameID)) && gameTypes.get(game.getRule()).getReward() > 0.0){
-						Main.econ.depositPlayer(player, gameTypes.get(game.getRule()).getReward());
-						player.sendMessage(plugin.chatColor(lang.PREFIX + lang.GAME_WON_MONEY.replaceAll("%reward%", gameTypes.get(game.getRule()).getReward()+"")));
+						Main.econ.depositPlayer(player, gameType.getReward());
+						player.sendMessage(plugin.chatColor(lang.PREFIX + lang.GAME_WON_MONEY.replaceAll("%reward%", gameType.getReward()+"")));
 					}
-					if(gameTypes.get(game.getRule()).isSaveStats()){
-						statistics.addStatistics(player.getUniqueId(), Main.gameID, gameTypes.get(game.getRule()).getKey(), (double) finalTime, SaveType.TIME_LOW);
+					if(gameType.isSaveStats()){
+						statistics.addStatistics(player.getUniqueId(), Main.gameID, gameType.getKey(), (double) finalTime, SaveType.TIME_LOW);
+					}
+					if(gameType.getTokens() > 0){
+						plugin.gameBox.wonTokens(player.getUniqueId(), gameType.getTokens(), Main.gameID);
 					}
 				} else {
 					if(game.isPlaySounds())player.playSound(player.getLocation(), Sounds.CLICK.bukkitSound(), volume, pitch);
