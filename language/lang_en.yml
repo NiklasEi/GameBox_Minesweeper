@@ -32,7 +32,6 @@ gameHelp:
   - '  &1&lWhen you uncover a mine you lost'
   - '&1&lThe goal is to uncover all slots '
   - '  &1&lexcept the mines'
-  - '&1&lFlag slots with right click'
-  - '  &1&lWhen you are sure that they cover a mine'
-  - '  &1&lYou can uncover them again with right click'
+  - '&1&lWhen you are sure about a slot containing'
+  - '  &1&la mine, flag it with right click'
   
