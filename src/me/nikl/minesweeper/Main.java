@@ -193,7 +193,7 @@ public class Main extends JavaPlugin {
 			ConfigurationSection buttonSec;
 			int bombsNum, tokens;
 			double cost, reward;
-			boolean saveStats;
+			boolean saveStats, bigGrid;
 
 			String displayName;
 			ArrayList<String> lore;
@@ -245,10 +245,14 @@ public class Main extends JavaPlugin {
 				cost = buttonSec.getDouble("cost", 0.);
 				reward = buttonSec.getDouble("reward", 0.);
 				tokens = buttonSec.getInt("tokens", 0);
+				bigGrid  = buttonSec.getBoolean("big", false);
+
+				// support older node for token
+				if(tokens == 0) tokens = buttonSec.getInt("token", 0);
 				saveStats = buttonSec.getBoolean("saveStats", false);
 
 
-				rules = new GameRules(buttonID, bombsNum, cost, reward, tokens, saveStats);
+				rules = new GameRules(buttonID, bombsNum, cost, reward, tokens, bigGrid, saveStats);
 
 				setTheButton:
 				if(buttonSec.isInt("slot")){
@@ -432,16 +436,7 @@ public class Main extends JavaPlugin {
 		} catch (FileNotFoundException e) { 
 			e.printStackTrace();
 			disabled = true;
-		} 
-
-		/*
-		InputStream defConfigStream = this.getResource("config.yml"); 
-		if (defConfigStream != null){		
-			@SuppressWarnings("deprecation") 
-			YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream); 
-			this.config.setDefaults(defConfig); 
 		}
-		*/
 	} 
 	
 	public GameManager getManager() {

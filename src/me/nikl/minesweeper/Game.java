@@ -35,13 +35,14 @@ public class Game{
 	private boolean playSounds;
 	private float volume = 0.5f, pitch= 1f;
 	
-	public Game(Main plugin, UUID player, int bombsNum, ItemStack[] items, boolean playSounds, String rule){
+	public Game(Main plugin, UUID player, int bombsNum, ItemStack[] items, boolean playSounds, GameRules rules){
 		this.updater = plugin.getUpdater();
 		this.player = player;
-		this.num = 54;
+		this.num = 54 + (rules.isBigGrid()?27:0);
+
 		this.playSounds = playSounds;
 		this.plugin = plugin;
-		this.rule = rule;
+		this.rule = rules.getKey();
 		this.lang = plugin.lang;
 		this.bombsNum = bombsNum;
 		this.displayTime = "00:00";
@@ -245,22 +246,22 @@ public class Game{
 		} else if (slot == 8){// corner top right
 			add = new int[3];
 			add[0] = -1; add[1] = 8; add[2] = 9;
-		} else if (slot == 45){// corner bottom left
+		} else if (slot == num - 9){// corner bottom left
 			add = new int[3];
 			add[0] = -9; add[1] = -8; add[2] = 1;
-		} else if (slot == 53){// corner bottom right
+		} else if (slot == num - 1){// corner bottom right
 			add = new int[3];
 			add[0] = -10; add[1] = -9; add[2] = -1;
 		} else if(slot>0 && slot<8){// edge top
 			add = new int[5];
 			add[0] = -1; add[1] = 1; add[2] = 8; add[3] = 9; add[4] = 10;
-		} else if(slot == 17 || slot == 26 || slot == 35 || slot == 44){// edge right
+		} else if(slot % 9 == 8){// edge right
 			add = new int[5];
 			add[0] = -10; add[1] = -9; add[2] = -1; add[3] = 8; add[4] = 9;
-		} else if(slot>45 && slot<53){// edge bottom
+		} else if(slot> num - 9 && slot< num - 1){// edge bottom
 			add = new int[5];
 			add[0] = -1; add[1] = -10; add[2] = -9; add[3] = -8; add[4] = 1;
-		} else if(slot == 9 || slot == 18 || slot == 27 || slot == 36){// edge left
+		} else if(slot % 9 == 0){// edge left
 			add = new int[5];
 			add[0] = -9; add[1] = -8; add[2] = 1; add[3] = 9; add[4] = 10;
 		} else {

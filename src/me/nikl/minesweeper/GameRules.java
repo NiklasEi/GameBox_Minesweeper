@@ -7,16 +7,17 @@ public class GameRules {
 
     private int numberOfBombs, tokens;
     private double cost, reward;
-    private boolean saveStats;
+    private boolean saveStats, bigGrid;
     private String key;
 
-    public GameRules(String key, int bombsNum, double cost, double reward, int tokens, boolean saveStats){
+    public GameRules(String key, int bombsNum, double cost, double reward, int tokens, boolean bigGrid, boolean saveStats){
         this.numberOfBombs = bombsNum;
         this.cost = cost;
         this.reward = reward;
         this.saveStats = saveStats;
         this.key = key;
         this.tokens = tokens;
+        this.bigGrid = bigGrid;
     }
 
     public int getNumberOfBombs() {
@@ -41,5 +42,9 @@ public class GameRules {
 
     public int getTokens() {
         return tokens;
+    }
+
+    public boolean isBigGrid() {
+        return bigGrid;
     }
 }

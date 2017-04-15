@@ -126,6 +126,11 @@ public class Language {
 			this.langFile = defaultLang;
 			return;
 		}
+		String fileName = plugin.getConfig().getString("langFile");
+		if(fileName.equalsIgnoreCase("default") || fileName.equalsIgnoreCase("default.yml")){
+			this.langFile = defaultLang;
+			return;
+		}
 		File languageFile = new File(plugin.getDataFolder().toString() + File.separatorChar + "language" + File.separatorChar + plugin.getConfig().getString("langFile"));
 		if(!languageFile.exists()){
 			languageFile.mkdir();

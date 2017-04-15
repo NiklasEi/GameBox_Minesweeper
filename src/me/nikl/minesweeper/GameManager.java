@@ -227,7 +227,7 @@ public class GameManager implements IGameManager{
 		if(!pay(players, rule.getCost())){
 			return GameBox.GAME_NOT_ENOUGH_MONEY;
 		}
-		games.put(players[0].getUniqueId(), new Game(plugin, players[0].getUniqueId(), rule.getNumberOfBombs(), items, (Main.playSounds && playSounds), strings[0]));
+		games.put(players[0].getUniqueId(), new Game(plugin, players[0].getUniqueId(), rule.getNumberOfBombs(), items, (Main.playSounds && playSounds), rule));
 		return GameBox.GAME_STARTED;
 	}
 
