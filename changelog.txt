@@ -1,2 +1,9 @@
+2.1.1:
+- 'big-mode'
+- changed nodes 'token' to 'tokens' in config to fix not any tokens being given to players (internally 'tokens' is used)
+--- game reads both for backward compatibility
+- mines in default hard from 11 to 10
+- accepting 'default' and 'default.yml' as lang file and changed default value in config to 'default'
+
 1.8.1:
 - corrected top list head for /mstop e:n:h
