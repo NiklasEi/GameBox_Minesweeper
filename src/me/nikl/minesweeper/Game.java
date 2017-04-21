@@ -1,7 +1,7 @@
 package me.nikl.minesweeper;
 
 import io.netty.util.internal.ConcurrentSet;
-import me.nikl.minesweeper.nms.Update;
+import me.nikl.gamebox.nms.NMSUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -25,7 +25,7 @@ public class Game{
 
 	// wait for the first click to start the timer
 	private boolean started = false;
-	private Update updater;
+	private NMSUtil updater;
 	
 	private Main plugin;
 	private GameTimer timer;
@@ -290,7 +290,7 @@ public class Game{
 		if(playerP == null){
 			plugin.getManager().removeFromGame(player);
 		}
-		updater.updateTitle(Bukkit.getPlayer(player), ChatColor.translateAlternateColorCodes('&',state));
+		updater.updateInventoryTitle(Bukkit.getPlayer(player), ChatColor.translateAlternateColorCodes('&',state));
 	}
 
 	public void setState() {
