@@ -17,6 +17,7 @@ import me.nikl.gamebox.guis.GUIManager;
 import me.nikl.gamebox.guis.button.AButton;
 import me.nikl.gamebox.guis.gui.game.GameGui;
 import me.nikl.gamebox.guis.gui.game.TopListPage;
+import me.nikl.gamebox.nms.NMSUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -28,7 +29,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import me.nikl.minesweeper.nms.*;
 import net.milkbowl.vault.economy.Economy;
 
 
@@ -43,7 +43,7 @@ public class Main extends JavaPlugin {
 	public boolean econEnabled;
 	public Language lang;
 	public boolean disabled;
-	private Update updater;
+	private NMSUtil updater;
 	
 	public boolean automaticReveal;
 	public static String gameID = "minesweeper";
@@ -57,13 +57,6 @@ public class Main extends JavaPlugin {
 
 	@Override
 	public void onEnable(){
-
-        if (!setupUpdater()) {
-            getLogger().severe("Your server version is not compatible with this plugin!");
-
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
-        }
         
 		this.con = new File(this.getDataFolder().toString() + File.separatorChar + "config.yml");
 
@@ -73,45 +66,12 @@ public class Main extends JavaPlugin {
 		hook();
 		if(disabled) return;
 
+		this.updater = gameBox.getNMS();
+
         //this.getCommand("minesweeperTop").setExecutor(new TopCommand(this));
 	}
-	
-	private boolean setupUpdater() {
-		String version;
-	
-		try {
-			version = Bukkit.getServer().getClass().getPackage().getName().replace(".",  ",").split(",")[3];
-		} catch (ArrayIndexOutOfBoundsException whatVersionAreYouUsingException) {
-			return false;
-		}
-	
-		//getLogger().info("Your server is running version " + version);
-	
-		if (version.equals("v1_10_R1")) {
-			updater = new Update_1_10_R1();
-			
-		} else if (version.equals("v1_9_R2")) {
-			updater = new Update_1_9_R2();
-			
-		} else if (version.equals("v1_9_R1")) {
-			updater = new Update_1_9_R1();
-			
-		} else if (version.equals("v1_8_R3")) {
-			updater = new Update_1_8_R3();
-			
-		} else if (version.equals("v1_8_R2")) {
-			updater = new Update_1_8_R2();
-			
-		} else if (version.equals("v1_8_R1")) {
-			updater = new Update_1_8_R1();
-			
-		} else if (version.equals("v1_11_R1")) {
-			updater = new Update_1_11_R1();
-		}
-		return updater != null;
-	}
 
-	public Update getUpdater(){
+	public NMSUtil getUpdater(){
 		return this.updater;
 	}
 	
