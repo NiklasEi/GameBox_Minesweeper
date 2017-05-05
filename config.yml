@@ -61,7 +61,6 @@ gameBox:
       displayName: "&c&lCompetition"
       lore:
       - ""
-      - "&3&lThis is played on a big grid!"
       - "&1Mines: &r13"
       - "&cClimb up the &ltop list"
       - "&aGood luck!"
@@ -70,7 +69,7 @@ gameBox:
       - "&1Reward: &a75"
       - "&1Tokens: &a3"
       mines: 13
-      big: true
+      big: false
       slot: 24
       cost: 50
       reward: 75
