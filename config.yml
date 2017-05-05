@@ -68,7 +68,7 @@ gameBox:
       - "&1Cost: &450"
       - "&1Reward: &a75"
       - "&1Tokens: &a3"
-      mines: 13
+      mines: 10
       big: false
       slot: 24
       cost: 50
