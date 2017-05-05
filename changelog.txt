@@ -1,3 +1,11 @@
+- add mandarin file
+- mkdir for lang folder...
+- defaults all on small grid!
+
+
+
+
+--------------------------------------------------------------------------
 2.1.1:
 - 'big-mode'
 - changed nodes 'token' to 'tokens' in config to fix not any tokens being given to players (internally 'tokens' is used)
