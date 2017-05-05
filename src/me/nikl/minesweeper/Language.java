@@ -110,11 +110,16 @@ public class Language {
 		
 		File defaultEn = new File(plugin.getDataFolder().toString() + File.separatorChar + "language" + File.separatorChar + "lang_en.yml");
 		if(!defaultEn.exists()){
+			defaultEn.getParentFile().mkdirs();
 			plugin.saveResource("language" + File.separatorChar + "lang_en.yml", false);
 		}
 		File defaultEs = new File(plugin.getDataFolder().toString() + File.separatorChar + "language" + File.separatorChar + "lang_es.yml");
 		if(!defaultEs.exists()){
 			plugin.saveResource("language" + File.separatorChar + "lang_es.yml", false);
+		}
+		File defaultCn = new File(plugin.getDataFolder().toString() + File.separatorChar + "language" + File.separatorChar + "lang_zh-cn.yml");
+		if(!defaultCn.exists()){
+			plugin.saveResource("language" + File.separatorChar + "lang_zh-cn.yml", false);
 		}
 		File defaultDe = new File(plugin.getDataFolder().toString() + File.separatorChar + "language" + File.separatorChar + "lang_de.yml");
 		if(!defaultDe.exists()){
