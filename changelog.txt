@@ -1,6 +1,7 @@
 - add mandarin file
 - mkdir for lang folder...
 - defaults all on small grid!
+- replace all non numbers in version
 
 
 
