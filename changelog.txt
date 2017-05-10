@@ -1,10 +1,9 @@
+
+- removed deprecated methods and variables (now depends on GB version 1.3.0)
 - add mandarin file
 - mkdir for lang folder...
 - defaults all on small grid!
 - replace all non numbers in version
-
-
-
 
 --------------------------------------------------------------------------
 2.1.1:
