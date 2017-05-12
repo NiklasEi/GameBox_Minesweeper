@@ -19,6 +19,7 @@ import me.nikl.gamebox.guis.button.AButton;
 import me.nikl.gamebox.guis.gui.game.GameGui;
 import me.nikl.gamebox.guis.gui.game.TopListPage;
 import me.nikl.gamebox.nms.NMSUtil;
+import me.nikl.gamebox.util.ItemStackUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -53,6 +54,10 @@ public class Main extends JavaPlugin {
 	private final String[][] depends =  new String[][]{
 			new String[]{"Vault", "1.5"},
 			new String[]{"GameBox", "1.3.0"}
+	};
+
+	private final String[] subCommands = new String[]{
+			"minesweeper", "ms"
 	};
 
 
@@ -96,7 +101,7 @@ public class Main extends JavaPlugin {
 
 	private void hook() {
 		if(Bukkit.getPluginManager().getPlugin("GameBox") == null || !Bukkit.getPluginManager().getPlugin("GameBox").isEnabled()){
-			Bukkit.getLogger().log(Level.SEVERE, " GameBox not found");
+			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes( '&', " &cGameBox not found!"));
 			Bukkit.getLogger().log(Level.SEVERE, "   Get the newest version here:");
 			Bukkit.getLogger().log(Level.SEVERE, "   https://www.spigotmc.org/resources/37273/");
 			Bukkit.getPluginManager().disablePlugin(this);
@@ -125,8 +130,9 @@ public class Main extends JavaPlugin {
 			if(minVersion[i] < version[i]) break;
 			if(minVersion[i].equals(version[i])) continue;
 
-			Bukkit.getLogger().log(Level.WARNING, " Your GameBox is outdated!");
-			Bukkit.getLogger().log(Level.WARNING, " Get the latest version here: https://www.spigotmc.org/resources/gamebox.37273/");
+			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes( '&', " &cYour GameBox is outdated!"));
+			Bukkit.getLogger().log(Level.WARNING, " Get the latest version here: ");
+			Bukkit.getLogger().log(Level.WARNING, "   https://www.spigotmc.org/resources/37273/");
 			Bukkit.getLogger().log(Level.WARNING, " You need at least version " + depends[1][1]);
 			Bukkit.getPluginManager().disablePlugin(this);
 			disabled = true;
@@ -145,7 +151,7 @@ public class Main extends JavaPlugin {
 		gameBox.getPluginManager().registerGame(manager, gameID, lang.NAME, 1);
 
 		int gameGuiSlots = 54;
-		GameGui gameGui = new GameGui(gameBox, guiManager, gameGuiSlots, gameID, "main");
+		GameGui gameGui = new GameGui(gameBox, guiManager, gameGuiSlots, gameID, GUIManager.MAIN_GAME_GUI);
 		gameGui.setHelpButton(lang.GAME_HELP);
 
 
@@ -172,7 +178,7 @@ public class Main extends JavaPlugin {
 					continue;
 				}
 
-				ItemStack mat = getItemStack(buttonSec.getString("materialData"));
+				ItemStack mat = ItemStackUtil.getItemStack(buttonSec.getString("materialData"));
 				if(mat == null){
 					Bukkit.getLogger().log(Level.WARNING, " error loading: gameBox.gameButtons." + buttonID);
 					Bukkit.getLogger().log(Level.WARNING, "     invalid material data");
@@ -184,14 +190,14 @@ public class Main extends JavaPlugin {
 				ItemMeta meta = button.getItemMeta();
 
 				if(buttonSec.isString("displayName")){
-					displayName = chatColor(buttonSec.getString("displayName"));
+					displayName = GameBox.chatColor(buttonSec.getString("displayName"));
 					meta.setDisplayName(displayName);
 				}
 
 				if(buttonSec.isList("lore")){
 					lore = new ArrayList<>(buttonSec.getStringList("lore"));
 					for(int i = 0; i < lore.size();i++){
-						lore.set(i, chatColor(lore.get(i)));
+						lore.set(i, GameBox.chatColor(lore.get(i)));
 					}
 					meta.setLore(lore);
 				}
@@ -243,21 +249,21 @@ public class Main extends JavaPlugin {
 			ConfigurationSection mainButtonSec = config.getConfigurationSection("gameBox.mainButton");
 			if(!mainButtonSec.isString("materialData")) break getMainButton;
 
-			ItemStack gameButton = getItemStack(mainButtonSec.getString("materialData"));
+			ItemStack gameButton = ItemStackUtil.getItemStack(mainButtonSec.getString("materialData"));
 			if(gameButton == null){
 				gameButton = (new ItemStack(Material.TNT));
 			}
 			ItemMeta meta = gameButton.getItemMeta();
-			meta.setDisplayName(chatColor(mainButtonSec.getString("displayName",lang.NAME)));
+			meta.setDisplayName(GameBox.chatColor(mainButtonSec.getString("displayName",lang.NAME)));
 			if(mainButtonSec.isList("lore")){
 				ArrayList<String> lore = new ArrayList<>(mainButtonSec.getStringList("lore"));
 				for(int i = 0; i < lore.size();i++){
-					lore.set(i, chatColor(lore.get(i)));
+					lore.set(i, GameBox.chatColor(lore.get(i)));
 				}
 				meta.setLore(lore);
 			}
 			gameButton.setItemMeta(meta);
-			guiManager.registerGameGUI(gameID, "main", gameGui, gameButton, "minesweeper", "ms");
+			guiManager.registerGameGUI(gameID, GUIManager.MAIN_GAME_GUI, gameGui, gameButton, subCommands);
 		} else {
 			Bukkit.getLogger().log(Level.WARNING, " Missing or wrong configured main button in the configuration file!");
 		}
@@ -291,7 +297,7 @@ public class Main extends JavaPlugin {
 					continue;
 				}
 
-				ItemStack mat = getItemStack(buttonSec.getString("materialData"));
+				ItemStack mat = ItemStackUtil.getItemStack(buttonSec.getString("materialData"));
 				if(mat == null){
 					Bukkit.getLogger().log(Level.WARNING, " error loading: gameBox.topListButtons." + buttonID);
 					Bukkit.getLogger().log(Level.WARNING, "     invalid material data");
@@ -303,14 +309,14 @@ public class Main extends JavaPlugin {
 				ItemMeta meta = button.getItemMeta();
 
 				if(buttonSec.isString("displayName")){
-					meta.setDisplayName(chatColor(buttonSec.getString("displayName")));
+					meta.setDisplayName(GameBox.chatColor(buttonSec.getString("displayName")));
 				}
 
 
 				if(buttonSec.isList("lore")){
 					lore = new ArrayList<>(buttonSec.getStringList("lore"));
 					for(int i = 0; i < lore.size();i++){
-						lore.set(i, chatColor(lore.get(i)));
+						lore.set(i, GameBox.chatColor(lore.get(i)));
 					}
 					meta.setLore(lore);
 				}
@@ -338,57 +344,22 @@ public class Main extends JavaPlugin {
 				if(buttonSec.isList("skullLore")){
 					lore = new ArrayList<>(buttonSec.getStringList("skullLore"));
 					for(int i = 0; i < lore.size();i++){
-						lore.set(i, chatColor(lore.get(i)));
+						lore.set(i, GameBox.chatColor(lore.get(i)));
 					}
 				} else {
 					lore = new ArrayList<>(Arrays.asList("", "No lore specified in the config!"));
 				}
 
-				TopListPage topListPage = new TopListPage(gameBox, guiManager, 54, gameID, buttonID + GUIManager.TOP_LIST_KEY_ADDON, buttonSec.isString("inventoryTitle")? ChatColor.translateAlternateColorCodes('&',buttonSec.getString("inventoryTitle")):"Title missing in config", SaveType.TIME_LOW, lore);
+				TopListPage topListPage = new TopListPage(gameBox, guiManager, 54, gameID,
+						buttonID + GUIManager.TOP_LIST_KEY_ADDON,
+						GameBox.chatColor(buttonSec.getString("inventoryTitle", "Title missing in config")),
+						SaveType.TIME_LOW, lore);
 
 				guiManager.registerTopList(gameID, buttonID, topListPage);
 			}
 		}
 	}
 
-
-
-
-	private ItemStack getItemStack(String itemPath){
-		Material mat; short data;
-		String[] obj = itemPath.split(":");
-
-		if (obj.length == 2) {
-			try {
-				mat = Material.matchMaterial(obj[0]);
-			} catch (Exception e) {
-				return null; // material name doesn't exist
-			}
-
-			try {
-				data = Short.valueOf(obj[1]);
-			} catch (NumberFormatException e) {
-				e.printStackTrace();
-				return null; // data not a number
-			}
-
-			//noinspection deprecation
-			if(mat == null) return null;
-			ItemStack stack = new ItemStack(mat);
-			stack.setDurability(data);
-			return stack;
-		} else {
-			try {
-				mat = Material.matchMaterial(obj[0]);
-			} catch (Exception e) {
-				return null; // material name doesn't exist
-			}
-			//noinspection deprecation
-			return (mat == null ? null : new ItemStack(mat));
-		}
-	}
-    
-    
     
 	public void reloadConfig(){
 		try { 
@@ -428,7 +399,7 @@ public class Main extends JavaPlugin {
 		if(getConfig().getBoolean("economy.enabled")){
 			this.econEnabled = true;
 			if (!setupEconomy()){
-				Bukkit.getConsoleSender().sendMessage(chatColor(lang.PREFIX + " &4No economy found!"));
+				Bukkit.getConsoleSender().sendMessage(GameBox.chatColor(lang.PREFIX + " &4No economy found!"));
 				getServer().getPluginManager().disablePlugin(this);
 				disabled = true;
 				return;
@@ -436,25 +407,13 @@ public class Main extends JavaPlugin {
 		}
 	}
 
-	public void setManager(GameManager manager) {
-		this.manager = manager;
-	}
-
 	public FileConfiguration getConfig() {
 		return config;
 	}
-	
-    public String chatColor(String message){
-    	return ChatColor.translateAlternateColorCodes('&', message);
-    }
     
     public Boolean getEconEnabled(){
     	return this.econEnabled;
     }
-
-	public String getGameID(){
-    	return this.gameID;
-	}
 
 	public GameBox getGameBox(){
 		return  this.gameBox;

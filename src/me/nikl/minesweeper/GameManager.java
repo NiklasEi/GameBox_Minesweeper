@@ -8,6 +8,7 @@ import java.util.logging.Level;
 
 import me.nikl.gamebox.GameBox;
 import me.nikl.gamebox.Permissions;
+import me.nikl.gamebox.Sounds;
 import me.nikl.gamebox.data.SaveType;
 import me.nikl.gamebox.data.Statistics;
 import me.nikl.gamebox.game.IGameManager;
@@ -44,8 +45,8 @@ public class GameManager implements IGameManager{
 		this.lang = plugin.lang;
 
 		if(!getMaterials()){
-			Bukkit.getConsoleSender().sendMessage(plugin.chatColor(lang.PREFIX+" &4Failed to load materials from config"));
-			Bukkit.getConsoleSender().sendMessage(plugin.chatColor(lang.PREFIX+" &4Using default materials"));
+			Bukkit.getConsoleSender().sendMessage(GameBox.chatColor(lang.PREFIX+" &4Failed to load materials from config"));
+			Bukkit.getConsoleSender().sendMessage(GameBox.chatColor(lang.PREFIX+" &4Using default materials"));
 			this.flagged = new ItemStack(Material.SIGN);
 			ItemMeta metaFlagged = flagged.getItemMeta();
 			metaFlagged.setDisplayName(ChatColor.translateAlternateColorCodes('&',"&aFlag"));
@@ -115,7 +116,7 @@ public class GameManager implements IGameManager{
 				ItemMeta metaCovered = covered.getItemMeta();
 				metaCovered.setDisplayName("Cover");
 				if(named)
-					metaCovered.setDisplayName(plugin.chatColor(name));
+					metaCovered.setDisplayName(GameBox.chatColor(name));
 				covered.setItemMeta(metaCovered);
 				covered.setAmount(1);
 
@@ -125,7 +126,7 @@ public class GameManager implements IGameManager{
 				ItemMeta metaNumber = number.getItemMeta();
 				metaNumber.setDisplayName("Warning");
 				if(named)
-					metaNumber.setDisplayName(plugin.chatColor(name));
+					metaNumber.setDisplayName(GameBox.chatColor(name));
 				number.setItemMeta(metaNumber);
 
 			} else if(key.equals("mine")){
@@ -134,7 +135,7 @@ public class GameManager implements IGameManager{
 				ItemMeta metaMine = mine.getItemMeta();
 				metaMine.setDisplayName("&4Mine");
 				if(named)
-					metaMine.setDisplayName(plugin.chatColor(name));
+					metaMine.setDisplayName(GameBox.chatColor(name));
 				mine.setItemMeta(metaMine);
 
 			} else if(key.equals("flag")){
@@ -143,7 +144,7 @@ public class GameManager implements IGameManager{
 				ItemMeta metaFlagged = flagged.getItemMeta();
 				metaFlagged.setDisplayName("Flag");
 				if(named)
-					metaFlagged.setDisplayName(plugin.chatColor(name));
+					metaFlagged.setDisplayName(GameBox.chatColor(name));
 				flagged.setItemMeta(metaFlagged);
 				flagged.setAmount(1);
 			}
@@ -179,7 +180,7 @@ public class GameManager implements IGameManager{
 					if(game.isPlaySounds())player.playSound(player.getLocation(), Sounds.LEVEL_UP.bukkitSound(), volume, pitch);
 					if(plugin.econEnabled && !event.getWhoClicked().hasPermission(Permissions.BYPASS_ALL.getPermission()) && !event.getWhoClicked().hasPermission(Permissions.BYPASS_GAME.getPermission(Main.gameID)) && gameTypes.get(game.getRule()).getReward() > 0.0){
 						Main.econ.depositPlayer(player, gameType.getReward());
-						player.sendMessage(plugin.chatColor(lang.PREFIX + lang.GAME_WON_MONEY.replaceAll("%reward%", gameType.getReward()+"")));
+						player.sendMessage(lang.PREFIX + lang.GAME_WON_MONEY.replaceAll("%reward%", gameType.getReward()+""));
 					}
 					if(gameType.isSaveStats()){
 						statistics.addStatistics(player.getUniqueId(), Main.gameID, gameType.getKey(), (double) finalTime, SaveType.TIME_LOW);
@@ -247,10 +248,10 @@ public class GameManager implements IGameManager{
 		if (plugin.getEconEnabled() && !player[0].hasPermission(Permissions.BYPASS_ALL.getPermission()) && !player[0].hasPermission(Permissions.BYPASS_GAME.getPermission(Main.gameID)) && cost > 0.0) {
 			if (Main.econ.getBalance(player[0]) >= cost) {
 				Main.econ.withdrawPlayer(player[0], cost);
-				player[0].sendMessage(plugin.chatColor(lang.PREFIX + plugin.lang.GAME_PAYED.replaceAll("%cost%", String.valueOf(cost))));
+				player[0].sendMessage(lang.PREFIX + plugin.lang.GAME_PAYED.replaceAll("%cost%", String.valueOf(cost)));
 				return true;
 			} else {
-				player[0].sendMessage(plugin.chatColor(lang.PREFIX + plugin.lang.GAME_NOT_ENOUGH_MONEY));
+				player[0].sendMessage(lang.PREFIX + plugin.lang.GAME_NOT_ENOUGH_MONEY);
 				return false;
 			}
 		} else {

@@ -1,9 +1,10 @@
 package me.nikl.minesweeper;
 
 import io.netty.util.internal.ConcurrentSet;
+import me.nikl.gamebox.GameBox;
+import me.nikl.gamebox.Sounds;
 import me.nikl.gamebox.nms.NMSUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -51,7 +52,7 @@ public class Game{
 		this.number = items[2];
 		this.mine = items[3];
 		if(plugin.getConfig() == null){
-			Bukkit.getConsoleSender().sendMessage(plugin.chatColor(lang.PREFIX + " Failed to load config!"));
+			Bukkit.getConsoleSender().sendMessage(GameBox.chatColor(lang.PREFIX + " &cFailed to load config!"));
 			Bukkit.getPluginManager().disablePlugin(plugin);
 		}
 
@@ -64,7 +65,7 @@ public class Game{
 			cov[i]=true;
 			flagsGrid[i] = false;
 		}
-		this.inv = Bukkit.getServer().createInventory(null, num, ChatColor.translateAlternateColorCodes('&', lang.TITLE_BEGINNING));
+		this.inv = Bukkit.getServer().createInventory(null, num, lang.TITLE_BEGINNING);
 		createGame();
 		Player myPlayer = Bukkit.getPlayer(player);
 		if(myPlayer == null) return;
@@ -126,6 +127,7 @@ public class Game{
 					amount = Integer.parseInt(positions[i]);
 				} catch (NumberFormatException e) {
 					Bukkit.getLogger().severe("Something went wrong while building the game");
+					e.printStackTrace();
 				}
 				if(amount == 0){
 					this.inv.setItem(i, null);
@@ -227,6 +229,7 @@ public class Game{
 				amount = Integer.parseInt(positions[uncoverSlot]);
 			} catch (NumberFormatException e) {
 				Bukkit.getLogger().severe("Something went wrong while building the game");
+				e.printStackTrace();
 			}
 			if(amount == 0){
 				this.inv.setItem(uncoverSlot, null);
@@ -290,7 +293,7 @@ public class Game{
 		if(playerP == null){
 			plugin.getManager().removeFromGame(player);
 		}
-		updater.updateInventoryTitle(Bukkit.getPlayer(player), ChatColor.translateAlternateColorCodes('&',state));
+		updater.updateInventoryTitle(Bukkit.getPlayer(player), GameBox.chatColor(state));
 	}
 
 	public void setState() {
