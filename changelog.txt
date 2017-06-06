@@ -1,5 +1,9 @@
 
 - corrected lang en
+- push GB dep to 1.5.0
+--- now compatible with /gba reload
+
+
 --------------------------------------------------------------------------
 
 v 2.2.0
