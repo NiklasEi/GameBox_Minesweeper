@@ -53,7 +53,7 @@ public class Main extends JavaPlugin {
 
 	private final String[][] depends =  new String[][]{
 			new String[]{"Vault", "1.5"},
-			new String[]{"GameBox", "1.3.0"}
+			new String[]{"GameBox", "1.5.0"}
 	};
 
 	private final String[] subCommands = new String[]{
@@ -148,7 +148,7 @@ public class Main extends JavaPlugin {
 
 		this.manager = new GameManager(this);
 
-		gameBox.getPluginManager().registerGame(manager, gameID, lang.NAME, 1);
+		gameBox.getPluginManager().registerGame(this, manager, gameID, lang.NAME, 1);
 
 		int gameGuiSlots = 54;
 		GameGui gameGui = new GameGui(gameBox, guiManager, gameGuiSlots, gameID, GUIManager.MAIN_GAME_GUI);
@@ -263,7 +263,7 @@ public class Main extends JavaPlugin {
 				meta.setLore(lore);
 			}
 			gameButton.setItemMeta(meta);
-			guiManager.registerGameGUI(gameID, GUIManager.MAIN_GAME_GUI, gameGui, gameButton, subCommands);
+			guiManager.registerMainGameGUI(gameGui, gameButton, subCommands);
 		} else {
 			Bukkit.getLogger().log(Level.WARNING, " Missing or wrong configured main button in the configuration file!");
 		}
@@ -355,7 +355,7 @@ public class Main extends JavaPlugin {
 						GameBox.chatColor(buttonSec.getString("inventoryTitle", "Title missing in config")),
 						SaveType.TIME_LOW, lore);
 
-				guiManager.registerTopList(gameID, buttonID, topListPage);
+				guiManager.registerGameGUI(topListPage);
 			}
 		}
 	}
