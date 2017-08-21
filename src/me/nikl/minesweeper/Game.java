@@ -2,6 +2,7 @@ package me.nikl.minesweeper;
 
 import io.netty.util.internal.ConcurrentSet;
 import me.nikl.gamebox.GameBox;
+import me.nikl.gamebox.GameBoxSettings;
 import me.nikl.gamebox.Sounds;
 import me.nikl.gamebox.nms.NMSUtil;
 import org.bukkit.Bukkit;
@@ -65,7 +66,11 @@ public class Game{
 			cov[i]=true;
 			flagsGrid[i] = false;
 		}
-		this.inv = Bukkit.getServer().createInventory(null, num, lang.TITLE_BEGINNING);
+		String title = lang.TITLE_BEGINNING;
+		if(GameBoxSettings.checkInventoryLength && title.length() > 32){
+			title = "Title is too long!";
+		}
+		this.inv = Bukkit.getServer().createInventory(null, num, title);
 		createGame();
 		Player myPlayer = Bukkit.getPlayer(player);
 		if(myPlayer == null) return;
