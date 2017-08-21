@@ -2,6 +2,9 @@
 
 
 --------------------------------------------------------------------------
+v2.3.1
+- check inventory title length if GB flag is set
+
 
 v 2.3.0
 - corrected lang en
