@@ -33,34 +33,6 @@ public class Language {
 		PREFIX = getString("prefix");
 		NAME = getString("name");
 		getGameMessages();
-		// check for 1.8.x version
-		// if this is the version of the server check the length of the titles and shorten them if necessary
-		if(Bukkit.getBukkitVersion().split("\\.|-")[0].equals("1") && Bukkit.getBukkitVersion().split("\\.|-")[1].equals("8")){
-			boolean set = false; 
-			if(TITLE_BEGINNING.length() > 32){
-				set = true;
-				TITLE_BEGINNING = "Title in lang file too long!";
-			}
-			if((TITLE_INGAME.replaceAll("%state%", "55555").replaceAll("%timer%", "55555")).length() > 32){
-				set = true;
-				TITLE_INGAME = "Title in lang file too long!";
-			}
-			if((TITLE_END.replaceAll("%timer%", "55555")).length() > 32){
-				set = true;
-				TITLE_END = "Title in lang file too long!";
-			}
-			if(TITLE_LOST.length() > 32){
-				set = true;
-				TITLE_LOST = "Title in lang file too long!";
-			}
-			if(set){
-				Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', this.PREFIX + " &4+-+-+-+-+-+-+-+-+-+ Warning +-+-+-+-+-+-+-+-+-+"));
-				Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', this.PREFIX + " &4In 1.8.x inventory titles longer than 32 characters will lead to an error"));
-				Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', this.PREFIX + " &4Since this does not happen in 1.9.x and above the default titles are longer"));
-				Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', this.PREFIX + " &4Please shorten the inventory titles in the language file you use (set in the config)"));
-				Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', this.PREFIX + " &4Until you do this the titles will be shortend by the plugin to prevent the error!"));
-			}
-		}
 	}
 	
 	private void getGameMessages() {
