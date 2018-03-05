@@ -27,6 +27,9 @@ gameBox:
       - "&1Cost: &45"
       - "&1Reward: &a7"
       mines: 5
+      # When an empty slot is revealed, surrounding slots are revealed automatically
+      #   default: true
+      automaticRevealing: true
       slot: 11
       cost: 5
       reward: 7
@@ -98,17 +101,12 @@ gameBox:
 rules:
   # enable/disable sound
   playSounds: true
-  # when you reveal an empty slot automatic revealing will uncover all attached empty slots until the first slot
-  #   is not empty
-  # change this to true if you DON'T want this option
-  turnOffAutomaticRevealing: false
 
 
 # requires vault and an economy plugin
 #   to enable economy do not forget to enable it for GameBox too
 economy:
   enabled: false
-
 
 # use "Material:data" or "ID:data"
 materials:

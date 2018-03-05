@@ -1,15 +1,16 @@
-package me.nikl.minesweeper;
+package me.nikl.gamebox.games.minesweeper;
 
-import io.netty.util.internal.ConcurrentSet;
-import me.nikl.gamebox.GameBox;
 import me.nikl.gamebox.GameBoxSettings;
-import me.nikl.gamebox.Sounds;
-import me.nikl.gamebox.nms.NMSUtil;
+import me.nikl.gamebox.nms.NmsFactory;
+import me.nikl.gamebox.nms.NmsUtility;
+import me.nikl.gamebox.utility.Sound;
+import me.nikl.gamebox.utility.StringUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
@@ -27,36 +28,30 @@ public class Game{
 
 	// wait for the first click to start the timer
 	private boolean started = false;
-	private NMSUtil updater;
+	private NmsUtility updater;
 	
-	private Main plugin;
+	private Minesweeper minesweeper;
 	private GameTimer timer;
 
-	private String rule;
+	private GameRules rule;
 
 	private boolean playSounds;
 	private float volume = 0.5f, pitch= 1f;
 	
-	public Game(Main plugin, UUID player, int bombsNum, ItemStack[] items, boolean playSounds, GameRules rules){
-		this.updater = plugin.getUpdater();
+	public Game(Minesweeper minesweeper, UUID player, int bombsNum, ItemStack[] items, boolean playSounds, GameRules rules){
+		this.updater = NmsFactory.getNmsUtility();
 		this.player = player;
 		this.num = 54 + (rules.isBigGrid()?27:0);
-
 		this.playSounds = playSounds;
-		this.plugin = plugin;
-		this.rule = rules.getKey();
-		this.lang = plugin.lang;
+		this.minesweeper = minesweeper;
+		this.rule = rules;
+		this.lang = (Language) minesweeper.getGameLang();
 		this.bombsNum = bombsNum;
 		this.displayTime = "00:00";
 		this.covered = items[0];
 		this.flagged = items[1];
 		this.number = items[2];
 		this.mine = items[3];
-		if(plugin.getConfig() == null){
-			Bukkit.getConsoleSender().sendMessage(GameBox.chatColor(lang.PREFIX + " &cFailed to load config!"));
-			Bukkit.getPluginManager().disablePlugin(plugin);
-		}
-
 		this.flags=0;
 		this.positions = new String[num];
 		this.cov = new Boolean[num];
@@ -175,7 +170,7 @@ public class Game{
 			cancelTimer();
 			reveal();
 			Player realPlayer = Bukkit.getPlayer(player);
-			if(playSounds)realPlayer.playSound(realPlayer.getLocation(), Sounds.EXPLODE.bukkitSound(), volume, pitch);
+			if(playSounds)realPlayer.playSound(realPlayer.getLocation(), Sound.EXPLODE.bukkitSound(), volume, pitch);
 			setState(lang.TITLE_LOST);
 		} else {
 			int amount = 0;
@@ -186,7 +181,7 @@ public class Game{
 			}
 			if(amount == 0){
 				this.inv.setItem(slot, null);
-				if(plugin.automaticReveal) {
+				if(rule.isAutomaticRevealing()) {
 					uncoverEmpty(slot);
 				}
 			} else {
@@ -198,8 +193,8 @@ public class Game{
 	}
 	
 	private void uncoverEmpty(int slot) {
-		Set<Integer> uncover = new ConcurrentSet<>();
-		Set<Integer> newUncover = new ConcurrentSet<>();
+		Set<Integer> uncover = new HashSet<>();
+		Set<Integer> newUncover = new HashSet<>();
 		
 		uncover.add(slot);
 		int currentSlot = slot;
@@ -296,9 +291,9 @@ public class Game{
 	public void setState(String state){
 		Player playerP = Bukkit.getPlayer(player);
 		if(playerP == null){
-			plugin.getManager().removeFromGame(player);
+			minesweeper.getGameManager().removeFromGame(player);
 		}
-		updater.updateInventoryTitle(Bukkit.getPlayer(player), GameBox.chatColor(state));
+		updater.updateInventoryTitle(Bukkit.getPlayer(player), StringUtility.color(state));
 	}
 
 	public void setState() {
@@ -342,7 +337,7 @@ public class Game{
 		setState();		
 	}
 
-	public String getRule() {
+	public GameRules getRule() {
 		return rule;
 	}
 
@@ -353,5 +348,9 @@ public class Game{
 	public int getTimeInSeconds(){
 		if(timer == null) return -1;
 		return timer.getTime();
+	}
+
+	public Minesweeper getMinesweeper() {
+		return this.minesweeper;
 	}
 }

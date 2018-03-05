@@ -1,9 +1,8 @@
-package me.nikl.minesweeper;
+package me.nikl.gamebox.games.minesweeper;
 
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class GameTimer extends BukkitRunnable{
-	
 	private Game game;
 	private int time;
 	
@@ -11,7 +10,7 @@ public class GameTimer extends BukkitRunnable{
 		this.game = game;
 		this.time = 0;
 		
-		this.runTaskTimer(Main.getPlugin(Main.class), 20, 20);
+		this.runTaskTimer(game.getMinesweeper().getGameBox(), 20, 20);
 	}
 
 	@Override

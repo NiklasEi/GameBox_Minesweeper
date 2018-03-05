@@ -1,21 +1,19 @@
-package me.nikl.minesweeper;
+package me.nikl.gamebox.games.minesweeper;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.logging.Level;
-
-import me.nikl.gamebox.GameBox;
-import me.nikl.gamebox.Permissions;
-import me.nikl.gamebox.Sounds;
-import me.nikl.gamebox.data.SaveType;
-import me.nikl.gamebox.data.Statistics;
-import me.nikl.gamebox.game.IGameManager;
+import me.nikl.gamebox.data.database.DataBase;
+import me.nikl.gamebox.data.toplist.SaveType;
+import me.nikl.gamebox.game.exceptions.GameStartException;
+import me.nikl.gamebox.game.manager.EasyManager;
+import me.nikl.gamebox.game.rules.GameRule;
+import me.nikl.gamebox.games.MinesweeperPlugin;
+import me.nikl.gamebox.utility.Permission;
+import me.nikl.gamebox.utility.Sound;
+import me.nikl.gamebox.utility.StringUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -24,29 +22,34 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Wool;
 
-public class GameManager implements IGameManager{
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.logging.Level;
 
-	private Main plugin;
+public class GameManager extends EasyManager{
+	private Minesweeper plugin;
 	private Map<UUID, Game> games;
 	private Language lang;
 	private ItemStack covered, flagged, mine, number;
 	private ItemStack[] items;
 
-	private Statistics statistics;
+	private DataBase statistics;
 
-	private Map<String,GameRules> gameTypes;
+	private Map<String,GameRules> gameTypes = new HashMap<>();
 
 	private float volume = 0.5f, pitch = 1f;
 
-	public GameManager(Main plugin){
+	public GameManager(Minesweeper plugin){
 		this.games = new HashMap<>();
 		this.plugin = plugin;
-		this.statistics = plugin.getGameBox().getStatistics();
-		this.lang = plugin.lang;
+		this.statistics = plugin.getGameBox().getDataBase();
+		this.lang = (Language) plugin.getGameLang();
 
 		if(!getMaterials()){
-			Bukkit.getConsoleSender().sendMessage(GameBox.chatColor(lang.PREFIX+" &4Failed to load materials from config"));
-			Bukkit.getConsoleSender().sendMessage(GameBox.chatColor(lang.PREFIX+" &4Using default materials"));
+			plugin.warn(" Failed to load materials from config");
+			plugin.warn(" Using default materials");
 			this.flagged = new ItemStack(Material.SIGN);
 			ItemMeta metaFlagged = flagged.getItemMeta();
 			metaFlagged.setDisplayName(ChatColor.translateAlternateColorCodes('&',"&aFlag"));
@@ -67,15 +70,12 @@ public class GameManager implements IGameManager{
 			metaNumber.setDisplayName(ChatColor.translateAlternateColorCodes('&',"&6Warning"));
 			number.setItemMeta(metaNumber);
 		}
-
-
 		this.items = new ItemStack[]{covered,flagged,number,mine};
 	}
 
 
 	private Boolean getMaterials() {
 		Boolean worked = true;
-
 		Material mat = null;
 		int data = 0;
 		for(String key : Arrays.asList("cover", "warning", "mine", "flag")){
@@ -88,15 +88,12 @@ public class GameManager implements IGameManager{
 				name = plugin.getConfig().getString("displaynames." + key);
 				named = true;
 			}
-
-
 			if (obj.length == 2) {
 				try {
 					mat = Material.matchMaterial(obj[0]);
 				} catch (Exception e) {
 					worked = false; // material name doesn't exist
 				}
-
 				try {
 					data = Integer.valueOf(obj[1]);
 				} catch (NumberFormatException e) {
@@ -116,7 +113,7 @@ public class GameManager implements IGameManager{
 				ItemMeta metaCovered = covered.getItemMeta();
 				metaCovered.setDisplayName("Cover");
 				if(named)
-					metaCovered.setDisplayName(GameBox.chatColor(name));
+					metaCovered.setDisplayName(StringUtility.color(name));
 				covered.setItemMeta(metaCovered);
 				covered.setAmount(1);
 
@@ -126,7 +123,7 @@ public class GameManager implements IGameManager{
 				ItemMeta metaNumber = number.getItemMeta();
 				metaNumber.setDisplayName("Warning");
 				if(named)
-					metaNumber.setDisplayName(GameBox.chatColor(name));
+					metaNumber.setDisplayName(StringUtility.color(name));
 				number.setItemMeta(metaNumber);
 
 			} else if(key.equals("mine")){
@@ -135,7 +132,7 @@ public class GameManager implements IGameManager{
 				ItemMeta metaMine = mine.getItemMeta();
 				metaMine.setDisplayName("&4Mine");
 				if(named)
-					metaMine.setDisplayName(GameBox.chatColor(name));
+					metaMine.setDisplayName(StringUtility.color(name));
 				mine.setItemMeta(metaMine);
 
 			} else if(key.equals("flag")){
@@ -144,7 +141,7 @@ public class GameManager implements IGameManager{
 				ItemMeta metaFlagged = flagged.getItemMeta();
 				metaFlagged.setDisplayName("Flag");
 				if(named)
-					metaFlagged.setDisplayName(GameBox.chatColor(name));
+					metaFlagged.setDisplayName(StringUtility.color(name));
 				flagged.setItemMeta(metaFlagged);
 				flagged.setAmount(1);
 			}
@@ -155,9 +152,9 @@ public class GameManager implements IGameManager{
 
 
 	@Override
-	public boolean onInventoryClick(InventoryClickEvent event) {
+	public void onInventoryClick(InventoryClickEvent event) {
 		if(!isInGame(event.getWhoClicked().getUniqueId()) || event.getInventory() == null){
-			return false;
+			return;
 		}
 		int slot = event.getSlot();
 		Game game = games.get(event.getWhoClicked().getUniqueId());
@@ -168,7 +165,7 @@ public class GameManager implements IGameManager{
 		if(game.isCovered(slot)){
 			if(event.getAction().equals(InventoryAction.PICKUP_HALF)){
 				game.setFlagged(slot);
-				if(game.isPlaySounds())player.playSound(player.getLocation(), Sounds.CLICK.bukkitSound(), volume, pitch);
+				if(game.isPlaySounds())player.playSound(player.getLocation(), Sound.CLICK.bukkitSound(), volume, pitch);
 			} else if (event.getAction().equals(InventoryAction.PICKUP_ALL)){
 				game.uncover(slot);
 				if(game.isWon()){
@@ -176,36 +173,34 @@ public class GameManager implements IGameManager{
 					game.cancelTimer();
 					game.reveal();
 					game.setState(lang.TITLE_END.replaceAll("%timer%", game.getDisplayTime()+""));
-					GameRules gameType = gameTypes.get(game.getRule());
-					if(game.isPlaySounds())player.playSound(player.getLocation(), Sounds.LEVEL_UP.bukkitSound(), volume, pitch);
-					if(plugin.econEnabled && !event.getWhoClicked().hasPermission(Permissions.BYPASS_ALL.getPermission()) && !event.getWhoClicked().hasPermission(Permissions.BYPASS_GAME.getPermission(Main.gameID)) && gameTypes.get(game.getRule()).getReward() > 0.0){
-						Main.econ.depositPlayer(player, gameType.getReward());
-						player.sendMessage(lang.PREFIX + lang.GAME_WON_MONEY.replaceAll("%reward%", gameType.getReward()+""));
+					GameRules gameType = game.getRule();
+					if(game.isPlaySounds())player.playSound(player.getLocation(), Sound.LEVEL_UP.bukkitSound(), volume, pitch);
+					if(plugin.getSettings().isEconEnabled() && !Permission.BYPASS_GAME.hasPermission(event.getWhoClicked(), MinesweeperPlugin.MINESWEEPER) && game.getRule().getMoneyToWin() > 0.0){
+						plugin.getGameBox().econ.depositPlayer(player, gameType.getMoneyToWin());
+						player.sendMessage(lang.PREFIX + lang.GAME_WON_MONEY.replaceAll("%reward%", gameType.getMoneyToWin()+""));
 					}
 					if(gameType.isSaveStats()){
-						statistics.addStatistics(player.getUniqueId(), Main.gameID, gameType.getKey(), (double) finalTime, SaveType.TIME_LOW);
+						statistics.addStatistics(player.getUniqueId(), MinesweeperPlugin.MINESWEEPER, gameType.getKey(), (double) finalTime, SaveType.TIME_LOW);
 					}
-					if(gameType.getTokens() > 0){
-						plugin.gameBox.wonTokens(player.getUniqueId(), gameType.getTokens(), Main.gameID);
+					if(gameType.getTokenToWin() > 0){
+						plugin.getGameBox().wonTokens(player.getUniqueId(), gameType.getTokenToWin(), MinesweeperPlugin.MINESWEEPER);
 					}
 				} else {
-					if(game.isPlaySounds())player.playSound(player.getLocation(), Sounds.CLICK.bukkitSound(), volume, pitch);
+					if(game.isPlaySounds())player.playSound(player.getLocation(), Sound.CLICK.bukkitSound(), volume, pitch);
 				}
 			}
 		} else if(game.isFlagged(slot) && event.getAction().equals(InventoryAction.PICKUP_HALF)){
 			game.deFlag(slot);
-			if(game.isPlaySounds())player.playSound(player.getLocation(), Sounds.CLICK.bukkitSound(), volume, pitch);
+			if(game.isPlaySounds())player.playSound(player.getLocation(), Sound.CLICK.bukkitSound(), volume, pitch);
 		}
-		return true;
 	}
 
 	@Override
-	public boolean onInventoryClose(InventoryCloseEvent inventoryCloseEvent) {
+	public void onInventoryClose(InventoryCloseEvent inventoryCloseEvent) {
 		if(!isInGame(inventoryCloseEvent.getPlayer().getUniqueId()))
-			return false;
+			return;
 		games.get(inventoryCloseEvent.getPlayer().getUniqueId()).cancelTimer();
 		games.remove(inventoryCloseEvent.getPlayer().getUniqueId());
-		return true;
 	}
 
 	@Override
@@ -214,22 +209,21 @@ public class GameManager implements IGameManager{
 	}
 
 	@Override
-	public int startGame(Player[] players, boolean playSounds, String... strings) {
+	public void startGame(Player[] players, boolean playSounds, String... strings) throws GameStartException {
 		// first and only argument atm is the number of bombs
 		if(strings.length != 1){
 			Bukkit.getLogger().log(Level.WARNING, " unknown number of arguments to start a game: " + Arrays.asList(strings));
-			return GameBox.GAME_NOT_STARTED_ERROR;
+			throw new GameStartException(GameStartException.Reason.ERROR);
 		}
 		GameRules rule = gameTypes.get(strings[0]);
 		if(rule == null){
 			Bukkit.getLogger().log(Level.WARNING, " unknown argument to start a game: " + Arrays.asList(strings));
-			return GameBox.GAME_NOT_STARTED_ERROR;
+			throw new GameStartException(GameStartException.Reason.ERROR);
 		}
 		if(!pay(players, rule.getCost())){
-			return GameBox.GAME_NOT_ENOUGH_MONEY;
+			throw new GameStartException(GameStartException.Reason.NOT_ENOUGH_MONEY);
 		}
-		games.put(players[0].getUniqueId(), new Game(plugin, players[0].getUniqueId(), rule.getNumberOfBombs(), items, (Main.playSounds && playSounds), rule));
-		return GameBox.GAME_STARTED;
+		games.put(players[0].getUniqueId(), new Game(plugin, players[0].getUniqueId(), rule.getNumberOfBombs(), items, (plugin.getSettings().isPlaySounds() && playSounds), rule));
 	}
 
 	@Override
@@ -238,24 +232,24 @@ public class GameManager implements IGameManager{
 		games.remove(uuid);
 	}
 
-	public void setGameTypes(Map<String,GameRules> gameTypes) {
-		this.gameTypes = gameTypes;
+	@Override
+	public void loadGameRules(ConfigurationSection buttonSec, String buttonID) {
+		int bombsNum = buttonSec.getInt("mines", 8);
+		double cost = buttonSec.getDouble("cost", 0.);
+		double reward = buttonSec.getDouble("reward", 0.);
+		int tokens = buttonSec.getInt("tokens", 0);
+		boolean bigGrid  = buttonSec.getBoolean("big", false);
+		boolean saveStats = buttonSec.getBoolean("saveStats", false);
+		boolean automaticRevealing = buttonSec.getBoolean("automaticRevealing", true);
+		gameTypes.put(buttonID, new GameRules(buttonID, bombsNum, cost, reward, tokens, bigGrid, saveStats, automaticRevealing));
 	}
 
-
+	@Override
+	public Map<String, ? extends GameRule> getGameRules() {
+		return gameTypes;
+	}
 
 	private boolean pay(Player[] player, double cost) {
-		if (plugin.getEconEnabled() && !player[0].hasPermission(Permissions.BYPASS_ALL.getPermission()) && !player[0].hasPermission(Permissions.BYPASS_GAME.getPermission(Main.gameID)) && cost > 0.0) {
-			if (Main.econ.getBalance(player[0]) >= cost) {
-				Main.econ.withdrawPlayer(player[0], cost);
-				player[0].sendMessage(lang.PREFIX + plugin.lang.GAME_PAYED.replaceAll("%cost%", String.valueOf(cost)));
-				return true;
-			} else {
-				player[0].sendMessage(lang.PREFIX + plugin.lang.GAME_NOT_ENOUGH_MONEY);
-				return false;
-			}
-		} else {
-			return true;
-		}
+		return plugin.payIfNecessary(player[0], cost);
 	}
 }
