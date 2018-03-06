@@ -1,13 +1,14 @@
 package me.nikl.gamebox.games.minesweeper;
 
 import me.nikl.gamebox.GameBox;
+import me.nikl.gamebox.game.GameSettings;
 import me.nikl.gamebox.games.MinesweeperPlugin;
 
 /**
  * @author Niklas Eicker
  */
 public class Minesweeper extends me.nikl.gamebox.game.Game {
-    protected Minesweeper(GameBox gameBox) {
+    public Minesweeper(GameBox gameBox) {
         super(gameBox, MinesweeperPlugin.MINESWEEPER);
     }
 
@@ -23,7 +24,9 @@ public class Minesweeper extends me.nikl.gamebox.game.Game {
 
     @Override
     public void loadSettings() {
-
+        gameSettings.setGameType(GameSettings.GameType.SINGLE_PLAYER);
+        gameSettings.setHandleClicksOnHotbar(false);
+        gameSettings.setGameGuiSize(54);
     }
 
     @Override

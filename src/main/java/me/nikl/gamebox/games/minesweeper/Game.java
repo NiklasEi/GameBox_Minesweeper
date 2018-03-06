@@ -62,10 +62,7 @@ public class Game{
 			flagsGrid[i] = false;
 		}
 		String title = lang.TITLE_BEGINNING;
-		if(GameBoxSettings.checkInventoryLength && title.length() > 32){
-			title = "Title is too long!";
-		}
-		this.inv = Bukkit.getServer().createInventory(null, num, title);
+		this.inv = minesweeper.createInventory(num, title);
 		createGame();
 		Player myPlayer = Bukkit.getPlayer(player);
 		if(myPlayer == null) return;
