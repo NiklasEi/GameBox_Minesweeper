@@ -64,13 +64,13 @@ gameBox:
       displayName: "&c&lCompetition"
       lore:
       - ""
-      - "&1Mines: &r13"
+      - "&1Mines: &r10"
       - "&cClimb up the &ltop list"
       - "&aGood luck!"
       - ""
       - "&1Cost: &450"
       - "&1Reward: &a75"
-      - "&1Tokens: &a3"
+      - "&1Tokens: &a2"
       mines: 10
       big: false
       slot: 24
@@ -78,7 +78,7 @@ gameBox:
       reward: 75
       # if true the best score of this button is saved
       saveStats: true
-      tokens: 3
+      tokens: 2
   topListButtons:
     # use the same key as the game you want to display the top list for
     #   for that button 'saveStats' must be true (see above)
