@@ -176,15 +176,9 @@ public class GameManager extends EasyManager{
 					GameRules gameType = game.getRule();
 					if(game.isPlaySounds())player.playSound(player.getLocation(), Sound.LEVEL_UP.bukkitSound(), volume, pitch);
 					if(plugin.getSettings().isEconEnabled() && !Permission.BYPASS_GAME.hasPermission(event.getWhoClicked(), MinesweeperPlugin.MINESWEEPER) && game.getRule().getMoneyToWin() > 0.0){
-						plugin.getGameBox().econ.depositPlayer(player, gameType.getMoneyToWin());
 						player.sendMessage(lang.PREFIX + lang.GAME_WON_MONEY.replaceAll("%reward%", gameType.getMoneyToWin()+""));
 					}
-					if(gameType.isSaveStats()){
-						statistics.addStatistics(player.getUniqueId(), MinesweeperPlugin.MINESWEEPER, gameType.getKey(), (double) finalTime, SaveType.TIME_LOW);
-					}
-					if(gameType.getTokenToWin() > 0){
-						plugin.getGameBox().wonTokens(player.getUniqueId(), gameType.getTokenToWin(), MinesweeperPlugin.MINESWEEPER);
-					}
+					plugin.onGameWon(player, gameType, (double)finalTime);
 				} else {
 					if(game.isPlaySounds())player.playSound(player.getLocation(), Sound.CLICK.bukkitSound(), volume, pitch);
 				}
