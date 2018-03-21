@@ -1,6 +1,5 @@
 package me.nikl.gamebox.games.minesweeper;
 
-import me.nikl.gamebox.GameBoxSettings;
 import me.nikl.gamebox.nms.NmsFactory;
 import me.nikl.gamebox.nms.NmsUtility;
 import me.nikl.gamebox.utility.Sound;
@@ -10,7 +9,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
@@ -190,8 +193,8 @@ public class Game{
 	}
 	
 	private void uncoverEmpty(int slot) {
-		Set<Integer> uncover = new HashSet<>();
-		Set<Integer> newUncover = new HashSet<>();
+		List<Integer> uncover = new ArrayList<>();
+		List<Integer> newUncover = new ArrayList<>();
 		
 		uncover.add(slot);
 		int currentSlot = slot;
@@ -203,22 +206,22 @@ public class Game{
 				newUncover.add(add[i]);
 			}
 		}
-		while (!newUncover.isEmpty()){
-			for(int checkSlot : newUncover){
+		ListIterator<Integer> iterator = newUncover.listIterator(newUncover.size());
+		while (iterator.hasPrevious()){
+			int checkSlot = iterator.previous();
 				if (!uncover.contains(checkSlot)){
 					uncover.add(checkSlot);
-					newUncover.remove(checkSlot);
+					iterator.remove();
 					if(positions[checkSlot].equalsIgnoreCase("0")){
 						int[] newAdd = getSurroundings(checkSlot);
 						for(int i = 0; i < newAdd.length; i++){
 							newAdd[i] = newAdd[i] + checkSlot;
 							if(!uncover.contains(newAdd[i]) && !newUncover.contains(newAdd[i])){
-								newUncover.add(newAdd[i]);
+								iterator.add(newAdd[i]);
 							}
 						}
 					}
 				}
-			}
 		}
 		for(int uncoverSlot : uncover){
 			int amount = 0;

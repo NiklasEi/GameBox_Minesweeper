@@ -19,12 +19,11 @@ game:
     won: "Minesweeper   &2You won in &1%timer%"
     lost: "Minesweeper     &4You lost"
 
-
 prefix: "[&3Minesweeper&r]"
 name: "&1Minesweeper&r"
 
 gameHelp:
-  - '&1&lMinesweeper is about logic and some math ;)'
+  - '&1&lMinesweeper is about logic'
   - '&1&lUncover a slot with left click'
   - '  &1&lIt can either be empty, a mine or a warning'
   - '  &1&lWarnings indicate the number of mines'
@@ -33,5 +32,5 @@ gameHelp:
   - '&1&lThe goal is to uncover all slots '
   - '  &1&lexcept the mines'
   - '&1&lWhen you are sure about a slot containing'
-  - '  &1&la mine, flag it with right click'
+  - '  &1&la mine, flag it with right click ;)'
   

@@ -15,6 +15,7 @@ public class GameRules extends GameRuleRewards {
         super(key, saveStats, SaveType.TIME_LOW, cost, reward, tokens);
         this.numberOfBombs = bombsNum;
         this.bigGrid = bigGrid;
+        this.automaticRevealing = automaticRevealing;
     }
 
     public int getNumberOfBombs() {
