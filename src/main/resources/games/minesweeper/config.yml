@@ -16,7 +16,7 @@ gameBox:
     # lore of the button
     lore:
     - ""
-    - "&1Watch your step..."
+    - "&1Find all mines"
   gameButtons:
     easy:
       materialData: "WOOL:13"
@@ -45,23 +45,9 @@ gameBox:
       cost: 10
       reward: 15
       slot: 20
-    hard:
-      materialData: "WOOL:14"
-      displayName: "&cHard"
-      lore:
-      - ""
-      - "&1Mines: &r10"
-      - "&1Cost: &415"
-      - "&1Reward: &a25"
-      - "&1Tokens: &a1"
-      mines: 10
-      slot: 29
-      cost: 15
-      reward: 25
-      tokens: 1
     saveStats:
       materialData: "diamond_block"
-      displayName: "&c&lCompetition"
+      displayName: "&c&lHard"
       lore:
       - ""
       - "&1Mines: &r10"
