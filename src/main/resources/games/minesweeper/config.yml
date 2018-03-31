@@ -20,7 +20,7 @@ gameBox:
   gameButtons:
     easy:
       materialData: "WOOL:13"
-      displayName: "&aEasy"
+      displayName: "&a&lEasy"
       lore:
       - ""
       - "&1Mines: &r5"
@@ -30,12 +30,12 @@ gameBox:
       # When an empty slot is revealed, surrounding slots are revealed automatically
       #   default: true
       automaticRevealing: true
-      slot: 11
+      slot: 20
       cost: 5
       reward: 7
     normal:
       materialData: "WOOL:1"
-      displayName: "&6Normal"
+      displayName: "&a&lNormal"
       lore:
       - ""
       - "&1Mines: &r8"
@@ -44,10 +44,10 @@ gameBox:
       mines: 8
       cost: 10
       reward: 15
-      slot: 20
+      slot: 29
     saveStats:
       materialData: "diamond_block"
-      displayName: "&c&lHard"
+      displayName: "&a&lHard"
       lore:
       - ""
       - "&1Mines: &r10"
@@ -70,10 +70,10 @@ gameBox:
     #   for that button 'saveStats' must be true (see above)
     saveStats:
       materialData: "diamond_block"
-      displayName: "&cTop list"
+      displayName: "&a&lTop list"
       lore:
       - ""
-      - "&cCompetition &1top list"
+      - "&aHard &1top list"
       slot: 33
       # inventory title of the top list (%player% and %game%)
       inventoryTitle: '              Top List'
