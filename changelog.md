@@ -1,3 +1,6 @@
+### v 3.1.0
+- compatibility with minecraft 1.13
+
 ### v 3.0.0
 - compatible with gamebox v2
 - fuse competition and 'hard' game-modes
