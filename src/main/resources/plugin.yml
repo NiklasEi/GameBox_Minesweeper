@@ -1,6 +1,7 @@
 name: Minesweeper
 author: Nikl
 main: me.nikl.gamebox.games.MinesweeperPlugin
-version: 3.1.0
+version: 4.0.0-alpha
 website: nikl.me
+api-version: 1.14
 depend: [GameBox]
