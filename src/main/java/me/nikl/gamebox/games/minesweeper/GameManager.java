@@ -32,11 +32,8 @@ public class GameManager extends EasyManager{
 	private Language lang;
 	private ItemStack covered, flagged, mine, number;
 	private ItemStack[] items;
-
 	private DataBase statistics;
-
 	private Map<String,GameRules> gameTypes = new HashMap<>();
-
 	private float volume = 0.5f, pitch = 1f;
 
 	public GameManager(Minesweeper plugin){
@@ -70,9 +67,8 @@ public class GameManager extends EasyManager{
 		this.items = new ItemStack[]{covered,flagged,number,mine};
 	}
 
-
-	private Boolean getMaterials() {
-		Boolean worked = true;
+	private boolean getMaterials() {
+		boolean worked = true;
 		Material mat = null;
 		int data = 0;
 		for(String key : Arrays.asList("cover", "warning", "mine", "flag")){
@@ -133,7 +129,6 @@ public class GameManager extends EasyManager{
 		item.setItemMeta(meta);
 		return item;
 	}
-
 
 	@Override
 	public void onInventoryClick(InventoryClickEvent event) {
@@ -216,10 +211,9 @@ public class GameManager extends EasyManager{
 		double cost = buttonSec.getDouble("cost", 0.);
 		double reward = buttonSec.getDouble("reward", 0.);
 		int tokens = buttonSec.getInt("tokens", 0);
-		boolean bigGrid  = buttonSec.getBoolean("big", false);
 		boolean saveStats = buttonSec.getBoolean("saveStats", false);
 		boolean automaticRevealing = buttonSec.getBoolean("automaticRevealing", true);
-		gameTypes.put(buttonID, new GameRules(buttonID, bombsNum, cost, reward, tokens, bigGrid, saveStats, automaticRevealing));
+		gameTypes.put(buttonID, new GameRules(buttonID, bombsNum, cost, reward, tokens, saveStats, automaticRevealing));
 	}
 
 	@Override

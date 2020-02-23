@@ -8,22 +8,16 @@ import me.nikl.gamebox.game.rules.GameRuleRewards;
  */
 public class GameRules extends GameRuleRewards {
     private int numberOfBombs;
-    private boolean bigGrid;
     private boolean automaticRevealing;
 
-    public GameRules(String key, int bombsNum, double cost, double reward, int tokens, boolean bigGrid, boolean saveStats, boolean automaticRevealing){
+    public GameRules(String key, int bombsNum, double cost, double reward, int tokens, boolean saveStats, boolean automaticRevealing){
         super(key, saveStats, SaveType.TIME_LOW, cost, reward, tokens);
         this.numberOfBombs = bombsNum;
-        this.bigGrid = bigGrid;
         this.automaticRevealing = automaticRevealing;
     }
 
     public int getNumberOfBombs() {
         return numberOfBombs;
-    }
-
-    public boolean isBigGrid() {
-        return bigGrid;
     }
 
     public boolean isAutomaticRevealing() {
