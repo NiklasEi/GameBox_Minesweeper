@@ -1,29 +1,21 @@
 package me.nikl.gamebox.games;
 
-import me.nikl.gamebox.GameBox;
-import me.nikl.gamebox.Module;
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
+import me.nikl.gamebox.games.minesweeper.Minesweeper;
+import me.nikl.gamebox.module.GameBoxModule;
 
 /**
  * @author Niklas Eicker
  */
-public class MinesweeperPlugin extends JavaPlugin {
-    private GameBox gameBox;
+public class MinesweeperPlugin extends GameBoxModule {
     public static final String MINESWEEPER = "minesweeper";
 
     @Override
     public void onEnable() {
-        Plugin plugin = Bukkit.getPluginManager().getPlugin("GameBox");
-        if(plugin == null || !plugin.isEnabled()){
-            getLogger().warning(" GameBox was not found! Disabling LogicPuzzles...");
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
-        }
-        gameBox = (GameBox) plugin;
-        new Module(gameBox, MINESWEEPER
-                , "me.nikl.gamebox.games.minesweeper.Minesweeper"
-                , this, MINESWEEPER, "ms");
+        registerGame(MINESWEEPER, Minesweeper.class, "ms");
+    }
+
+    @Override
+    public void onDisable() {
+
     }
 }
