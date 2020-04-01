@@ -1,7 +1,6 @@
 package me.nikl.gamebox.games.minesweeper;
 
 import me.nikl.gamebox.data.database.DataBase;
-import me.nikl.gamebox.data.toplist.SaveType;
 import me.nikl.gamebox.game.exceptions.GameStartException;
 import me.nikl.gamebox.game.manager.EasyManager;
 import me.nikl.gamebox.game.rules.GameRule;
@@ -11,7 +10,6 @@ import me.nikl.gamebox.utility.Sound;
 import me.nikl.gamebox.utility.StringUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -19,8 +17,8 @@ import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.material.Wool;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,11 +32,8 @@ public class GameManager extends EasyManager{
 	private Language lang;
 	private ItemStack covered, flagged, mine, number;
 	private ItemStack[] items;
-
 	private DataBase statistics;
-
 	private Map<String,GameRules> gameTypes = new HashMap<>();
-
 	private float volume = 0.5f, pitch = 1f;
 
 	public GameManager(Minesweeper plugin){
@@ -50,22 +45,21 @@ public class GameManager extends EasyManager{
 		if(!getMaterials()){
 			plugin.warn(" Failed to load materials from config");
 			plugin.warn(" Using default materials");
-			this.flagged = new ItemStack(Material.SIGN);
+			this.flagged = new ItemStack(Material.OAK_SIGN, 1);
 			ItemMeta metaFlagged = flagged.getItemMeta();
 			metaFlagged.setDisplayName(ChatColor.translateAlternateColorCodes('&',"&aFlag"));
 			flagged.setItemMeta(metaFlagged);
 			flagged.setAmount(1);
-			this.covered = new ItemStack(Material.STAINED_GLASS_PANE);
-			covered.setDurability((short) 8);
+			this.covered = new ItemStack(Material.GRAY_STAINED_GLASS_PANE, 1);
 			ItemMeta metaCovered = covered.getItemMeta();
 			metaCovered.setDisplayName(ChatColor.translateAlternateColorCodes('&',"&1Cover"));
 			covered.setItemMeta(metaCovered);
 			covered.setAmount(1);
-			this.mine = new ItemStack(Material.TNT);
+			this.mine = new ItemStack(Material.TNT, 1);
 			ItemMeta metaMine = mine.getItemMeta();
 			metaMine.setDisplayName(ChatColor.translateAlternateColorCodes('&',"&4Mine"));
 			mine.setItemMeta(metaMine);
-			this.number = new Wool(DyeColor.ORANGE).toItemStack();
+			this.number = new ItemStack(Material.ORANGE_WOOL, 1);
 			ItemMeta metaNumber = number.getItemMeta();
 			metaNumber.setDisplayName(ChatColor.translateAlternateColorCodes('&',"&6Warning"));
 			number.setItemMeta(metaNumber);
@@ -73,20 +67,17 @@ public class GameManager extends EasyManager{
 		this.items = new ItemStack[]{covered,flagged,number,mine};
 	}
 
-
-	private Boolean getMaterials() {
-		Boolean worked = true;
+	private boolean getMaterials() {
+		boolean worked = true;
 		Material mat = null;
 		int data = 0;
 		for(String key : Arrays.asList("cover", "warning", "mine", "flag")){
 			if(!plugin.getConfig().isSet("materials." + key)) return false;
 			String value = plugin.getConfig().getString("materials." + key);
 			String[] obj = value.split(":");
-			String name = "default";
-			boolean named = false;
+			String name = "";
 			if(plugin.getConfig().isSet("displaynames." + key) && plugin.getConfig().isString("displaynames." + key)){
 				name = plugin.getConfig().getString("displaynames." + key);
-				named = true;
 			}
 			if (obj.length == 2) {
 				try {
@@ -108,48 +99,36 @@ public class GameManager extends EasyManager{
 			}
 			if(mat == null) return false;
 			if(key.equals("cover")){
-				this.covered = new ItemStack(mat, 1);
-				if (obj.length == 2) covered.setDurability((short) data);
-				ItemMeta metaCovered = covered.getItemMeta();
-				metaCovered.setDisplayName("Cover");
-				if(named)
-					metaCovered.setDisplayName(StringUtility.color(name));
-				covered.setItemMeta(metaCovered);
-				covered.setAmount(1);
+				this.covered = createFromMaterialData(mat, data, name);
 
 			} else if(key.equals("warning")){
-				this.number = new ItemStack(mat, 1);
-				if (obj.length == 2) number.setDurability((short) data);
-				ItemMeta metaNumber = number.getItemMeta();
-				metaNumber.setDisplayName("Warning");
-				if(named)
-					metaNumber.setDisplayName(StringUtility.color(name));
-				number.setItemMeta(metaNumber);
+				this.number = createFromMaterialData(mat, data, name);
 
 			} else if(key.equals("mine")){
-				this.mine = new ItemStack(mat, 1);
-				if (obj.length == 2) mine.setDurability((short) data);
-				ItemMeta metaMine = mine.getItemMeta();
-				metaMine.setDisplayName("&4Mine");
-				if(named)
-					metaMine.setDisplayName(StringUtility.color(name));
-				mine.setItemMeta(metaMine);
+				this.mine = createFromMaterialData(mat, data, name);
 
 			} else if(key.equals("flag")){
-				this.flagged = new ItemStack(mat, 1);
-				if (obj.length == 2) flagged.setDurability((short) data);
-				ItemMeta metaFlagged = flagged.getItemMeta();
-				metaFlagged.setDisplayName("Flag");
-				if(named)
-					metaFlagged.setDisplayName(StringUtility.color(name));
-				flagged.setItemMeta(metaFlagged);
-				flagged.setAmount(1);
+				this.flagged = createFromMaterialData(mat, data, name);
 			}
+			data = 0;
+			name = "";
 		}
 
 		return worked;
 	}
 
+	private ItemStack createFromMaterialData(Material mat, int data, String displayName) {
+		ItemStack item = new ItemStack(mat, 1);
+		ItemMeta meta = item.getItemMeta();
+		if (data > 0 && meta instanceof Damageable) {
+			((Damageable) meta).setDamage(data);
+		}
+		if (!displayName.isEmpty()) {
+			meta.setDisplayName(StringUtility.color(displayName));
+		}
+		item.setItemMeta(meta);
+		return item;
+	}
 
 	@Override
 	public void onInventoryClick(InventoryClickEvent event) {
@@ -232,10 +211,9 @@ public class GameManager extends EasyManager{
 		double cost = buttonSec.getDouble("cost", 0.);
 		double reward = buttonSec.getDouble("reward", 0.);
 		int tokens = buttonSec.getInt("tokens", 0);
-		boolean bigGrid  = buttonSec.getBoolean("big", false);
 		boolean saveStats = buttonSec.getBoolean("saveStats", false);
 		boolean automaticRevealing = buttonSec.getBoolean("automaticRevealing", true);
-		gameTypes.put(buttonID, new GameRules(buttonID, bombsNum, cost, reward, tokens, bigGrid, saveStats, automaticRevealing));
+		gameTypes.put(buttonID, new GameRules(buttonID, bombsNum, cost, reward, tokens, saveStats, automaticRevealing));
 	}
 
 	@Override

@@ -10,12 +10,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 
 
@@ -32,7 +29,7 @@ public class Game{
 	// wait for the first click to start the timer
 	private boolean started = false;
 	private NmsUtility updater;
-	
+
 	private Minesweeper minesweeper;
 	private GameTimer timer;
 
@@ -40,11 +37,11 @@ public class Game{
 
 	private boolean playSounds;
 	private float volume = 0.5f, pitch= 1f;
-	
+
 	public Game(Minesweeper minesweeper, UUID player, int bombsNum, ItemStack[] items, boolean playSounds, GameRules rules){
 		this.updater = NmsFactory.getNmsUtility();
 		this.player = player;
-		this.num = 54 + (rules.isBigGrid()?27:0);
+		this.num = 54;
 		this.playSounds = playSounds;
 		this.minesweeper = minesweeper;
 		this.rule = rules;
@@ -76,7 +73,7 @@ public class Game{
 	 * Build the grid with mines at random positions.
 	 * Then cover the inventory
 	 */
-	private void createGame(){		
+	private void createGame(){
 		Random r = new Random();
 		int rand = r.nextInt(num);
 		int count = 0;
@@ -95,12 +92,12 @@ public class Game{
 			}
 			positions[i] = getNextMines(i);
 		}
-		
+
 		for(int i=0;i<num;i++){
 			this.inv.setItem(i, covered);
 		}
 	}
-	
+
 	private String getNextMines(int i) {
 		int count = 0;
 		int[] add = getSurroundings(i);
@@ -142,7 +139,7 @@ public class Game{
 	public Boolean isCovered(int slot){
 		return (this.cov[slot] && !this.flagsGrid[slot]);
 	}
-	
+
 	public Boolean isFlagged(int slot){
 		return this.flagsGrid[slot];
 	}
@@ -157,14 +154,14 @@ public class Game{
 	}
 
 	public void deFlag(int slot) {
-		this.inv.setItem(slot, covered);	
+		this.inv.setItem(slot, covered);
 		flags--;
 		this.flagsGrid[slot] = false;
 		this.displayFlags = "   &2"+flags+"&r/&4"+bombsNum;
 		currentState = lang.TITLE_INGAME.replaceAll("%state%", displayFlags).replaceAll("%timer%", displayTime);
 		setState(currentState);
 	}
-	
+
 	public void uncover(int slot){
 		if(positions[slot].equals("mine")){
 			cancelTimer();
@@ -189,16 +186,16 @@ public class Game{
 				this.inv.setItem(slot, number);
 			}
 			cov[slot] = false;
-		}		
+		}
 	}
-	
+
 	private void uncoverEmpty(int slot) {
 		List<Integer> uncover = new ArrayList<>();
 		List<Integer> newUncover = new ArrayList<>();
-		
+
 		uncover.add(slot);
 		int currentSlot = slot;
-		
+
 		int[] add = getSurroundings(slot);
 		for(int i = 0; i < add.length; i++){
 			add[i] = add[i] + currentSlot;
@@ -240,7 +237,7 @@ public class Game{
 			cov[uncoverSlot] = false;
 		}
 	}
-	
+
 	public int[] getSurroundings(int slot){
 		int[] add;
 		if(slot == 0){// corner left top
@@ -273,8 +270,8 @@ public class Game{
 		}
 		return add;
 	}
-	
-	
+
+
 	public boolean isWon() {
 		int count = 0;
 		for(int i=0;i<num;i++){
@@ -297,7 +294,7 @@ public class Game{
 	}
 
 	public void setState() {
-		this.displayFlags = "   &2"+flags+"&r/&4"+bombsNum;	
+		this.displayFlags = "   &2"+flags+"&r/&4"+bombsNum;
 		currentState = lang.TITLE_INGAME.replaceAll("%state%", displayFlags).replaceAll("%timer%", displayTime);
 		setState(currentState);
 	}
@@ -334,7 +331,7 @@ public class Game{
 	public void start() {
 		setStarted(true);
 		startTimer();
-		setState();		
+		setState();
 	}
 
 	public GameRules getRule() {

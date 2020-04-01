@@ -19,7 +19,7 @@ gameBox:
     - "&1Find all mines"
   gameButtons:
     easy:
-      materialData: "WOOL:13"
+      materialData: "GREEN_WOOL"
       displayName: "&a&lEasy"
       lore:
       - ""
@@ -34,7 +34,7 @@ gameBox:
       cost: 5
       reward: 7
     normal:
-      materialData: "WOOL:1"
+      materialData: "ORANGE_WOOL"
       displayName: "&a&lNormal"
       lore:
       - ""
@@ -58,7 +58,6 @@ gameBox:
       - "&1Reward: &a75"
       - "&1Tokens: &a2"
       mines: 10
-      big: false
       slot: 24
       cost: 50
       reward: 75
@@ -94,12 +93,12 @@ rules:
 economy:
   enabled: false
 
-# use "Material:data" or "ID:data"
+# use "Material"
 materials:
-  cover: "stained_glass_pane:7"
-  flag: "SIGN"
+  cover: "GRAY_STAINED_GLASS_PANE"
+  flag: "OAK_SIGN"
   mine: "TNT"
-  warning: "WOOL:1"
+  warning: "ORANGE_WOOL"
 
 displaynames:
   cover: "&bCover"
