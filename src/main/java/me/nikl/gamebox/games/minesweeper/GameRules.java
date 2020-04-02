@@ -9,11 +9,13 @@ import me.nikl.gamebox.game.rules.GameRuleRewards;
 public class GameRules extends GameRuleRewards {
     private int numberOfBombs;
     private boolean automaticRevealing;
+    private boolean firstClickEmptyField;
 
-    public GameRules(String key, int bombsNum, double cost, double reward, int tokens, boolean saveStats, boolean automaticRevealing){
+    public GameRules(String key, int bombsNum, double cost, double reward, int tokens, boolean saveStats, boolean automaticRevealing, boolean firstClickEmptyField){
         super(key, saveStats, SaveType.TIME_LOW, cost, reward, tokens);
         this.numberOfBombs = bombsNum;
         this.automaticRevealing = automaticRevealing;
+        this.firstClickEmptyField = firstClickEmptyField;
     }
 
     public int getNumberOfBombs() {
@@ -22,5 +24,9 @@ public class GameRules extends GameRuleRewards {
 
     public boolean isAutomaticRevealing() {
         return automaticRevealing;
+    }
+
+    public boolean isFirstClickEmptyField() {
+        return firstClickEmptyField;
     }
 }

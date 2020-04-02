@@ -30,6 +30,9 @@ gameBox:
       # When an empty slot is revealed, surrounding slots are revealed automatically
       #   default: true
       automaticRevealing: true
+      # The first click always reveals an empty filed (no mine and no warning)
+      #   default: true
+      firstClickEmptyField: true
       slot: 20
       cost: 5
       reward: 7

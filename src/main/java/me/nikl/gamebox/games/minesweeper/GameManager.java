@@ -138,7 +138,7 @@ public class GameManager extends EasyManager{
 		int slot = event.getSlot();
 		Game game = games.get(event.getWhoClicked().getUniqueId());
 		if(!game.isStarted()){
-			game.start();
+			game.start(slot);
 		}
 		Player player = (Player) event.getWhoClicked();
 		if(game.isCovered(slot)){
@@ -213,7 +213,8 @@ public class GameManager extends EasyManager{
 		int tokens = buttonSec.getInt("tokens", 0);
 		boolean saveStats = buttonSec.getBoolean("saveStats", false);
 		boolean automaticRevealing = buttonSec.getBoolean("automaticRevealing", true);
-		gameTypes.put(buttonID, new GameRules(buttonID, bombsNum, cost, reward, tokens, saveStats, automaticRevealing));
+		boolean firstClickEmptyField = buttonSec.getBoolean("firstClickEmptyField", true);
+		gameTypes.put(buttonID, new GameRules(buttonID, bombsNum, cost, reward, tokens, saveStats, automaticRevealing, firstClickEmptyField));
 	}
 
 	@Override

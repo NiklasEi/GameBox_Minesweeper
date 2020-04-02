@@ -9,11 +9,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class Game{
@@ -86,15 +83,19 @@ public class Game{
 			count++;
 			rand = r.nextInt(num);
 		}
+		this.calculateWarnings();
+
+		for(int i=0;i<num;i++){
+			this.inv.setItem(i, covered);
+		}
+	}
+
+	private void calculateWarnings() {
 		for(int i=0;i<num;i++){
 			if(positions[i].equals("mine")){
 				continue;
 			}
 			positions[i] = getNextMines(i);
-		}
-
-		for(int i=0;i<num;i++){
-			this.inv.setItem(i, covered);
 		}
 	}
 
@@ -271,6 +272,14 @@ public class Game{
 		return add;
 	}
 
+	private int[] getSurroundingSlots(int centerSlot) {
+		int[] add = this.getSurroundings(centerSlot);
+		for (int i = 0; i < add.length; i++) {
+			add[i] = add[i] + centerSlot;
+		}
+		return add;
+	}
+
 
 	public boolean isWon() {
 		int count = 0;
@@ -328,10 +337,37 @@ public class Game{
 		this.started = started;
 	}
 
-	public void start() {
+	public void start(int slotClicked) {
 		setStarted(true);
+		if(this.rule.isFirstClickEmptyField()) {
+			removeMinesFromClickedArea(slotClicked);
+		}
 		startTimer();
 		setState();
+	}
+
+	private void removeMinesFromClickedArea(int slotClicked) {
+		List<Integer> slots = Arrays.stream(getSurroundingSlots(slotClicked))
+				.boxed()
+				.collect(Collectors.toList());
+		slots.add(slotClicked);
+		Random r = new Random();
+		boolean movedMines = false;
+		for (int slot : slots) {
+			if (!positions[slot].equals("mine")) {
+				continue;
+			}
+			int rand = r.nextInt(num);
+			while(slots.contains(rand) || positions[rand].equals("mine")) {
+				rand = r.nextInt(num);
+			}
+			positions[rand] = "mine";
+			positions[slot] = "0";
+			movedMines = true;
+		}
+		if (movedMines) {
+			this.calculateWarnings();
+		}
 	}
 
 	public GameRules getRule() {

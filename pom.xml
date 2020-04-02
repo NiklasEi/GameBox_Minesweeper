@@ -8,7 +8,7 @@
     <artifactId>minesweeper</artifactId>
     <name>Minesweeper</name>
     <packaging>jar</packaging>
-    <version>4.0.0-beta</version>
+    <version>4.0.0-beta.2</version>
     <description>Use logic to find all mines</description>
 
     <distributionManagement>
